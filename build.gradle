@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'jacoco'
 }
 
 group 'com.revolut'
@@ -34,5 +35,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("${buildDir}/reports/coverage")
 }
 
