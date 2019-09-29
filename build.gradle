@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group 'com.revolut'
+version '0.1.0'
+
+sourceCompatibility = 11
+
+ext {
+    log4jVersion = '2.12.1'
+    jacksonVersion = '2.9.10'
+    nanohttpdVersion = '2.3.1'
+
+    junitVersion = '5.3.1'
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.nanohttpd:nanohttpd:${nanohttpdVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testImplementation "org.skyscreamer:jsonassert:1.5.0"
+}
+
+test {
+    useJUnitPlatform()
+}
+
