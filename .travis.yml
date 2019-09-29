@@ -2,9 +2,6 @@ language: java
 jdk:
   - openjdk11
   - openjdk-ea
-env:
-  global:
-    - CODECOV_TOKEN=:uuid-repo-token
 matrix:
   allow_failures:
     - jdk: openjdk-ea
