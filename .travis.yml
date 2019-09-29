@@ -1,0 +1,16 @@
+language: java
+jdk:
+  - openjdk11
+  - openjdk-ea
+env:
+  global:
+    - CODECOV_TOKEN=:uuid-repo-token
+matrix:
+  allow_failures:
+    - jdk: openjdk-ea
+before_script:
+  - chmod +x gradlew
+script:
+  - ./gradlew check --info
+after_success:
+  bash <(curl -s https://codecov.io/bash) -cF server
