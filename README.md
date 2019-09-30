@@ -24,5 +24,28 @@ Implicit requirements:
 
 Please put your work on github or bitbucket. 
 
----
+## Design decisions
 
+### How to store currency codes?
+
+Where was 2 options on how to represent the codes in SQL schema:
+ - Store values as `ENUM`
+ - Store them in a separate EAV table
+Due to a few amount of currently supported currencies the second
+way has been considered more appropriate.
+Use of the 1st option would lead to a lot of ALTER TYPE
+operations in future which involves high risks and reduces flexibility.
+
+Also, assume the similar implementation of the operation in PostgreSQL:
+>The problem is that changing the member list for an ENUM column
+>restructures the entire table with ALTER TABLE, which can be very
+>expensive on resources and time. If you have ENUM('red', 'blue', 'black')
+>but need to change it to ENUM('red', 'blue', 'white'), MySQL needs to
+>rebuild your table and look through every record to check for
+>the now-invalid value 'black'. MySQL is literally dumb and will
+>even do this when all you did was add a new value to the end of
+>the member list! (It is rumored that appending an ENUM member list
+>will be handled better in the future, but I doubt that this
+>is a high priority feature.)
+
+[Source](https://stackoverflow.com/a/31308166/4186817)
