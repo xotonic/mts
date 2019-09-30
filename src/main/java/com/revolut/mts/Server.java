@@ -31,9 +31,13 @@ public class Server extends NanoHTTPD implements AutoCloseable {
 
     @Override
     public Response serve(IHTTPSession session) {
+        logger.info(">>> {}: {}", session.getMethod(), session.getUri());
+        final var response = serveInternal(session);
+        logger.info("<<< {}", response.getStatus().getRequestStatus());
+        return response;
+    }
 
-        logger.info("{}: {}", session.getMethod(), session.getUri());
-
+    private Response serveInternal(IHTTPSession session) {
         try {
             final var responseProvider = new ResponseProvider() {
                 @Override

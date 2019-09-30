@@ -14,12 +14,12 @@ public class SimpleRouter implements Router {
 
     @Override
     public void Get(String route, RoutedHandler handler) {
-        routes.getOrDefault(route, new HashMap<>()).put(HMethod.GET, handler);
+        routes.computeIfAbsent(route, k -> new HashMap<>()).put(HMethod.GET, handler);
     }
 
     @Override
     public void Post(String route, RoutedHandler handler) {
-        routes.getOrDefault(route, new HashMap<>()).put(HMethod.GET, handler);
+        routes.computeIfAbsent(route, k -> new HashMap<>()).put(HMethod.POST, handler);
     }
 
     @Override
