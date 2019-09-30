@@ -63,14 +63,14 @@ public class Server extends NanoHTTPD implements AutoCloseable {
         try {
             var response = new JSONResponse<>(body);
             var result = jsonMapper.writeValueAsString(response);
-            return newFixedLengthResponse(code, MIME_TYPE_JSON, result);
+            return newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON, result);
         } catch (Exception e) {
             return absoluteError(HStatus.INTERNAL_ERROR);
         }
     }
 
     private Response absoluteError(HStatus code, String message) {
-        return newFixedLengthResponse(code, MIME_TYPE_JSON,
+        return newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON,
                 String.format("{\"result\":null,\"error\":{\"code\":%d,\"message:\":\"%s\"}}",
                         code.getRequestStatus(), message));
     }

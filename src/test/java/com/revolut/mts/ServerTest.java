@@ -9,9 +9,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(HttpClientExtension.class)
 class ServerTest {
@@ -58,7 +57,7 @@ class ServerTest {
 
         try (var server = new Server(router, 8080)) {
             final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            final var allowed = response.headers().firstValue("Allowed");
+            final var allowed = response.headers().firstValue("allow");
 
             assertEquals(405, response.statusCode());
             allowed.ifPresentOrElse(v -> assertEquals("GET", v), Assertions::fail);

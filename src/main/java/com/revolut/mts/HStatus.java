@@ -2,29 +2,28 @@ package com.revolut.mts;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public enum HStatus implements NanoHTTPD.Response.IStatus {
-    OK(200, "OK"),
-    NOT_FOUND(404, "Not Found"),
-    METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
-    INTERNAL_ERROR(500, "Internal Server Error"),
+public enum HStatus {
+    OK(NanoHTTPD.Response.Status.OK),
+    NOT_FOUND(NanoHTTPD.Response.Status.NOT_FOUND),
+    METHOD_NOT_ALLOWED(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED),
+    INTERNAL_ERROR(NanoHTTPD.Response.Status.INTERNAL_ERROR),
     ;
 
-    private final int requestStatus;
+    NanoHTTPD.Response.IStatus status;
 
-    private final String description;
-
-    HStatus(int requestStatus, String description) {
-        this.requestStatus = requestStatus;
-        this.description = description;
+    HStatus(NanoHTTPD.Response.IStatus status) {
+        this.status = status;
     }
 
-    @Override
     public String getDescription() {
-        return  this.description;
+        return status.getDescription();
     }
 
-    @Override
     public int getRequestStatus() {
-        return this.requestStatus;
+        return status.getRequestStatus();
+    }
+
+    public NanoHTTPD.Response.IStatus getStatus() {
+        return status;
     }
 }

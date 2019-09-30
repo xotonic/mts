@@ -1,6 +1,6 @@
 package com.revolut.mts;
 
-public class RequestContext {
+public class RequestContext implements ResponseProvider {
 
     private ResponseProvider responseProvider;
 
@@ -18,10 +18,6 @@ public class RequestContext {
 
     public HResponse error(HStatus status, String message) {
         return responseProvider.error(status, message);
-    }
-
-    public HResponse error(HStatus status) {
-        return responseProvider.error(status);
     }
 
 }
