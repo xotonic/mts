@@ -1,6 +1,5 @@
 package com.revolut.mts;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.revolut.mts.dto.JSONResponse;
@@ -19,14 +18,13 @@ public class Server extends NanoHTTPD implements AutoCloseable {
     private ObjectMapper jsonMapper;
     private Router router;
 
-    public Server() throws IOException {
-        super(8080);
+    public Server(Router router, int port) throws IOException {
+        super(port);
+
+        this.router = router;
 
         jsonMapper = new ObjectMapper();
         jsonMapper.registerModule(new JavaTimeModule());
-
-        router = new Router();
-        router.addRoute("/status", rq -> new JSONResponse<>(true));
 
         start();
     }
@@ -37,43 +35,43 @@ public class Server extends NanoHTTPD implements AutoCloseable {
         logger.info("{}: {}", session.getMethod(), session.getUri());
 
         try {
-            var result = router.route(session.getUri(), session);
-            return result
-                    .map(this::response)
-                    .orElseGet(() -> absoluteError(Response.Status.NOT_FOUND));
+            final var responseProvider = new ResponseProvider() {
+                @Override
+                public HResponse success(HStatus status, Object body) {
+                    return new HResponse(response(status, body));
+                }
+
+                @Override
+                public HResponse error(HStatus status, String message) {
+                    return new HResponse(absoluteError(status, message));
+                }
+            };
+            var method = HMethod.map(session.getMethod());
+            var result = router.route(method, session.getUri());
+            final var context = new RequestContext(responseProvider);
+            return result.handle(context).getResponse();
         } catch (Exception e) {
-            return absoluteError(Response.Status.INTERNAL_ERROR);
+            return absoluteError(HStatus.INTERNAL_ERROR);
         }
     }
 
-    private <T> Response ok(T body) throws JsonProcessingException {
-        var response = new JSONResponse<>(body);
-        var result = jsonMapper.writeValueAsString(response);
-        return newFixedLengthResponse(Response.Status.OK, MIME_TYPE_JSON, result);
-    }
-
-    private Response response(JSONResponse response) {
-
-        String result;
+    private Response response(HStatus code, Object body) {
         try {
-            result = jsonMapper.writeValueAsString(response);
-        } catch (JsonProcessingException e) {
-            return absoluteError(Response.Status.INTERNAL_ERROR);
+            var response = new JSONResponse<>(body);
+            var result = jsonMapper.writeValueAsString(response);
+            return newFixedLengthResponse(code, MIME_TYPE_JSON, result);
+        } catch (Exception e) {
+            return absoluteError(HStatus.INTERNAL_ERROR);
         }
-
-        if (response.failed()) {
-            return newFixedLengthResponse(
-                    Response.Status.lookup(response.error().getCode()),
-                    MIME_TYPE_JSON, result);
-        }
-
-        return newFixedLengthResponse(Response.Status.OK, MIME_TYPE_JSON, result);
     }
 
-    private Response absoluteError(Response.Status code) {
+    private Response absoluteError(HStatus code, String message) {
         return newFixedLengthResponse(code, MIME_TYPE_JSON,
                 String.format("{\"result\":null,\"error\":{\"code\":%d,\"message:\":\"%s\"}}",
-                        code.getRequestStatus(), code.getDescription()));
+                        code.getRequestStatus(), message));
+    }
+    private Response absoluteError(HStatus code) {
+        return absoluteError(code, code.getDescription());
     }
 
     @Override
