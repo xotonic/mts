@@ -8,11 +8,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class H2Database {
+public class H2Database implements Database {
 
     private JdbcDataSource dataSource;
 
-    H2Database() {
+    public H2Database() {
         // Enable this to make H2 recognize files in resources directory
         ClassPathURLSupport.enable();
     }
@@ -27,6 +27,7 @@ public class H2Database {
     }
 
 
+    @Override
     public Connection connection() {
         try {
             if (dataSource == null) {
