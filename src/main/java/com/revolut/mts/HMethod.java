@@ -5,6 +5,7 @@ import fi.iki.elonen.NanoHTTPD;
 enum HMethod {
    GET(NanoHTTPD.Method.GET),
    POST(NanoHTTPD.Method.POST),
+   PUT(NanoHTTPD.Method.PUT),
 
    UNKNOWN(null)
    ;

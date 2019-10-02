@@ -1,10 +1,11 @@
-package com.revolut.mts;
+package com.revolut.mts.util;
 
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 
 /**
  * JUnit 5 extension which injects initialized http client to a test instance

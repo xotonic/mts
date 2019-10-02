@@ -7,8 +7,11 @@ import java.util.Currency;
 import java.util.List;
 
 public interface MoneyTransferService {
-    JSONResponse<Transaction> send(String userName, String recipient, MoneyAmount amount);
-    JSONResponse<Deposit> deposit(String userName, MoneyAmount amount);
-    JSONResponse<Transaction> convertCurrencies(String username, MoneyAmount amount, Currency target);
-    JSONResponse<List<Transaction>> getTransactions(String userName, TransactionQuery query);
+    Body<Transaction> send(String userName, String recipient, MoneyAmount amount);
+
+    Body<Deposit> deposit(String userName, MoneyAmount amount);
+
+    Body<Transaction> convertCurrencies(String username, MoneyAmount amount, Currency target);
+
+    Body<List<Transaction>> getTransactions(String userName, TransactionQuery query);
 }

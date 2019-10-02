@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
-public class JSONResponse<RESULT> {
+public class Body<RESULT> {
 
     @JsonProperty("result")
     private RESULT result;
@@ -12,13 +12,13 @@ public class JSONResponse<RESULT> {
     @JsonProperty("error")
     JSONError error;
 
-    public JSONResponse(RESULT result) {
+    public Body(RESULT result) {
         this.result = result;
         this.error = null;
     }
 
-    public static EmptyResponse failure(JSONError error) {
-        var failure = new EmptyResponse();
+    public static EmptyBody failure(JSONError error) {
+        var failure = new EmptyBody();
         failure.error = error;
         return failure;
     }
@@ -42,7 +42,7 @@ public class JSONResponse<RESULT> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JSONResponse<?> that = (JSONResponse<?>) o;
+        Body<?> that = (Body<?>) o;
         return Objects.equals(result, that.result) &&
                 Objects.equals(error, that.error);
     }

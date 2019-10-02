@@ -4,7 +4,8 @@ import fi.iki.elonen.NanoHTTPD;
 
 import java.util.StringJoiner;
 
-public class HResponse  {
+@SuppressWarnings("unused")
+public class HResponse<T> {
 
     private NanoHTTPD.Response response;
 

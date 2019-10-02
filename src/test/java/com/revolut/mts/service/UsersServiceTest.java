@@ -1,8 +1,10 @@
 package com.revolut.mts.service;
 
 import com.revolut.mts.Database;
-import com.revolut.mts.H2DatabaseExtension;
-import com.revolut.mts.dto.EmptyResponse;
+import com.revolut.mts.HStatus;
+import com.revolut.mts.dto.EmptyBody;
+import com.revolut.mts.util.H2DatabaseExtension;
+import com.revolut.mts.util.TestContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -14,7 +16,9 @@ class UsersServiceTest {
     @Test
     void happyPath(Database db) throws Exception {
         final var service = new UsersServiceImpl(db);
-        assertEquals(new EmptyResponse(), service.createUser("tester"));
+        var ctx = new TestContext();
+        service.createUser(ctx, "tester");
+        assertEquals(new EmptyBody(), ctx.getLastBody(EmptyBody.class));
         final var userId = service.getUser("tester");
         assertTrue(userId.isPresent());
     }
@@ -22,11 +26,18 @@ class UsersServiceTest {
     @Test
     void createSameSameUser(Database db) throws Exception {
         final var service = new UsersServiceImpl(db);
-        assertEquals(new EmptyResponse(), service.createUser("tester"));
-        final var rs = service.createUser("tester");
-        assertTrue(rs.failed());
-        assertEquals(409, rs.error().getCode());
-        assertEquals("The user already exists", rs.error().getMessage());
+
+        var ctx = new TestContext();
+
+        service.createUser(ctx, "tester");
+        assertEquals(new EmptyBody(), ctx.getLastBody(EmptyBody.class));
+
+        service.createUser(ctx, "tester");
+
+        assertFalse(ctx.isSuccess());
+
+        assertEquals(HStatus.CONFICT, ctx.getLastStatus());
+        assertEquals("The user already exists", ctx.getLastErrorMessage());
     }
 
 }

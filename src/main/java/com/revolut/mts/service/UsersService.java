@@ -1,15 +1,19 @@
 package com.revolut.mts.service;
 
-import com.revolut.mts.dto.EmptyResponse;
+import com.revolut.mts.HResponse;
+import com.revolut.mts.RequestContext;
+import com.revolut.mts.dto.Body;
+import com.revolut.mts.dto.EmptyBody;
 import com.revolut.mts.dto.MoneyAmount;
-import com.revolut.mts.dto.JSONResponse;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UsersService {
-    EmptyResponse createUser(String userName) throws Exception;
-    JSONResponse<List<MoneyAmount>> getWallet(String userName) throws Exception;
+    HResponse<EmptyBody> createUser(RequestContext ctx, String userName) throws Exception;
+
+    HResponse<Body<List<MoneyAmount>>>
+    getWallet(RequestContext ctx, String userName) throws Exception;
 
     Optional<Integer> getUser(String userName) throws Exception;
 }

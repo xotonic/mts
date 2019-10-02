@@ -1,9 +1,11 @@
 package com.revolut.mts;
 
 interface ResponseProvider {
-    HResponse success(HStatus status, Object body);
-    HResponse error(HStatus status, String message);
-    default HResponse error(HStatus status) {
+    <T> HResponse<T> respond(HStatus status, T body);
+
+    <T> HResponse<T> error(HStatus status, String message);
+
+    default <T> HResponse<T> error(HStatus status) {
         return error(status, status.getDescription());
     }
 }

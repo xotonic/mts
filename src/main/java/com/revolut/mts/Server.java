@@ -2,7 +2,7 @@ package com.revolut.mts;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.revolut.mts.dto.JSONResponse;
+import com.revolut.mts.dto.Body;
 import fi.iki.elonen.NanoHTTPD;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,27 +41,30 @@ public class Server extends NanoHTTPD implements AutoCloseable {
         try {
             final var responseProvider = new ResponseProvider() {
                 @Override
-                public HResponse success(HStatus status, Object body) {
-                    return new HResponse(response(status, body));
+                public <T> HResponse<T> respond(HStatus status, T body) {
+                    return new HResponse<>(response(status, body));
                 }
 
                 @Override
-                public HResponse error(HStatus status, String message) {
-                    return new HResponse(absoluteError(status, message));
+                public <T> HResponse<T> error(HStatus status, String message) {
+                    return new HResponse<>(absoluteError(status, message));
                 }
             };
             var method = HMethod.map(session.getMethod());
             var result = router.route(method, session.getUri());
-            final var context = new RequestContext(responseProvider);
-            return result.handle(context).getResponse();
+            final var context = new RequestContextImpl(responseProvider);
+            if (result.exists()) {
+                context.setPath(result.getPathValues());
+            }
+            return result.getHandler().handle(context).getResponse();
         } catch (Exception e) {
             return absoluteError(HStatus.INTERNAL_ERROR);
         }
     }
 
-    private Response response(HStatus code, Object body) {
+    private <T> Response response(HStatus code, T body) {
         try {
-            var response = new JSONResponse<>(body);
+            var response = new Body<>(body);
             var result = jsonMapper.writeValueAsString(response);
             return newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON, result);
         } catch (Exception e) {

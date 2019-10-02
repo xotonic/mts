@@ -1,13 +1,13 @@
-package com.revolut.mts;
+package com.revolut.mts.util;
 
+import com.revolut.mts.Database;
+import com.revolut.mts.H2Database;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-import java.net.http.HttpClient;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Due to process scope of H2 database timeline,

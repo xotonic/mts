@@ -1,6 +1,7 @@
 package com.revolut.mts;
 
 
+import com.revolut.mts.service.UsersServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,6 +13,11 @@ public class Application {
 
         var router = new SimpleRouter();
         router.Get("/status", c -> c.ok(true));
+
+        var db = new H2Database();
+        var usersService = new UsersServiceImpl(db);
+
+        router.Put("/users/{}", c -> usersService.createUser(c, c.getString(0)));
 
         try (var server = new Server(router, 8080)) {
             logger.info("Server started on {}", server.getListeningPort());
