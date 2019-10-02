@@ -1,5 +1,7 @@
 package com.revolut.mts;
 
+import com.revolut.mts.http.Server;
+import com.revolut.mts.http.SimpleRouter;
 import com.revolut.mts.util.HttpClientExtension;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

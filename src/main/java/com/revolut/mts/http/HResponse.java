@@ -1,4 +1,4 @@
-package com.revolut.mts;
+package com.revolut.mts.http;
 
 import fi.iki.elonen.NanoHTTPD;
 

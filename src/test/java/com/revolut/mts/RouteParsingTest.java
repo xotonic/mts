@@ -1,5 +1,7 @@
 package com.revolut.mts;
 
+import com.revolut.mts.http.routing.RoutePathImpl;
+import com.revolut.mts.http.routing.RouteTemplate;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

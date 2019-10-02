@@ -1,4 +1,7 @@
-package com.revolut.mts;
+package com.revolut.mts.http;
+
+import com.revolut.mts.http.routing.RoutePath;
+import com.revolut.mts.http.routing.RoutedHandler;
 
 /**
  * A delegating facade for {@link RoutedHandler}

@@ -1,8 +1,8 @@
-package com.revolut.mts;
+package com.revolut.mts.http;
 
 import fi.iki.elonen.NanoHTTPD;
 
-enum HMethod {
+public enum HMethod {
    GET(NanoHTTPD.Method.GET),
    POST(NanoHTTPD.Method.POST),
    PUT(NanoHTTPD.Method.PUT),

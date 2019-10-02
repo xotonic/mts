@@ -1,4 +1,6 @@
-package com.revolut.mts;
+package com.revolut.mts.http;
+
+import com.revolut.mts.http.routing.*;
 
 import java.util.HashMap;
 import java.util.Map;

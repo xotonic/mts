@@ -1,8 +1,8 @@
 package com.revolut.mts.util;
 
-import com.revolut.mts.HResponse;
-import com.revolut.mts.HStatus;
-import com.revolut.mts.RequestContext;
+import com.revolut.mts.http.HResponse;
+import com.revolut.mts.http.HStatus;
+import com.revolut.mts.http.RequestContext;
 import fi.iki.elonen.NanoHTTPD;
 
 public class TestContext implements RequestContext {

@@ -1,4 +1,4 @@
-package com.revolut.mts;
+package com.revolut.mts.http;
 
 interface ResponseProvider {
     <T> HResponse<T> respond(HStatus status, T body);

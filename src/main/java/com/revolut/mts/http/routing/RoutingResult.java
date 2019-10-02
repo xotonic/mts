@@ -1,4 +1,4 @@
-package com.revolut.mts;
+package com.revolut.mts.http.routing;
 
 public interface RoutingResult {
     static RoutingResult miss(RoutedHandler handler) {

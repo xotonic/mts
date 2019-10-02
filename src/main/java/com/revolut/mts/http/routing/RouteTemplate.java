@@ -1,4 +1,4 @@
-package com.revolut.mts;
+package com.revolut.mts.http.routing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +107,7 @@ public class RouteTemplate {
         @Override
         public boolean isValid(String value) {
             try {
-                java.lang.Integer.parseUnsignedInt(value);
+                Integer.parseUnsignedInt(value);
                 return true;
             } catch (NumberFormatException e) {
                 return false;

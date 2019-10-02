@@ -1,8 +1,8 @@
 package com.revolut.mts.service;
 
 import com.revolut.mts.Database;
-import com.revolut.mts.HStatus;
 import com.revolut.mts.dto.EmptyBody;
+import com.revolut.mts.http.HStatus;
 import com.revolut.mts.util.H2DatabaseExtension;
 import com.revolut.mts.util.TestContext;
 import org.junit.jupiter.api.Test;

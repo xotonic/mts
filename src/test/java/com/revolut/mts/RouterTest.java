@@ -1,13 +1,14 @@
 package com.revolut.mts;
 
+import com.revolut.mts.http.HMethod;
+import com.revolut.mts.http.HStatus;
+import com.revolut.mts.http.SimpleRouter;
 import com.revolut.mts.util.TestContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RouterTest {
-
-    private static class SuccessException extends RuntimeException {}
 
     @Test
     void routerDispatchesCorrectly() throws Exception {

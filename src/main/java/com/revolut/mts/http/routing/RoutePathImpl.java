@@ -1,4 +1,4 @@
-package com.revolut.mts;
+package com.revolut.mts.http.routing;
 
 import java.util.ArrayList;
 import java.util.List;
