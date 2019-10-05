@@ -3,7 +3,7 @@ package com.revolut.mts.service;
 import com.revolut.mts.Database;
 import com.revolut.mts.http.Server;
 import com.revolut.mts.http.SimpleRouter;
-import com.revolut.mts.util.H2DatabaseExtension;
+import com.revolut.mts.util.DatabaseExtension;
 import com.revolut.mts.util.HttpClientExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +16,7 @@ import java.net.http.HttpResponse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith({HttpClientExtension.class, H2DatabaseExtension.class})
+@ExtendWith({HttpClientExtension.class, DatabaseExtension.class})
 public class UserServiceIT {
 
     @Test

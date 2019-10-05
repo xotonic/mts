@@ -16,7 +16,7 @@ public class Application {
         var router = new SimpleRouter();
         router.Get("/status", c -> c.ok(true));
 
-        var db = new H2Database();
+        var db = new MariaDB();
         var usersService = new UsersServiceImpl(db);
 
         router.Put("/users/{}", c -> usersService.createUser(c, c.getString(0)));
@@ -24,7 +24,7 @@ public class Application {
         try (var server = new Server(router, 8080)) {
             logger.info("Server started on {}", server.getListeningPort());
         } catch (Exception e) {
-            logger.fatal(e);
+            logger.fatal("Failed to run application", e);
         }
     }
 }

@@ -23,10 +23,12 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public HResponse<EmptyBody> createUser(RequestContext ctx, String userName) throws SQLException {
-        var stmt = db.connection().prepareStatement("INSERT INTO users(name) VALUES (?)");
-        stmt.setString(1, userName);
-        try {
+        try (var conn = db.connection();
+             var stmt = conn.prepareStatement("INSERT INTO users(name) VALUES (?)")) {
+            stmt.setString(1, userName);
+
             stmt.executeUpdate();
+
         } catch (SQLIntegrityConstraintViolationException e) {
             return ctx.error(HStatus.CONFICT, "The user already exists");
         }
@@ -35,13 +37,15 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public Optional<Integer> getUser(String userName) throws Exception {
-        var stmt = db.connection().prepareStatement("SELECT id FROM users WHERE name = ?");
-        stmt.setString(1, userName);
-        var rs = stmt.executeQuery();
-        if (rs.next()) {
-            return Optional.of(rs.getInt(1));
+        try (var conn = db.connection();
+             var stmt = conn.prepareStatement("SELECT id FROM users WHERE name = ?")) {
+            stmt.setString(1, userName);
+            var rs = stmt.executeQuery();
+            if (rs.next()) {
+                return Optional.of(rs.getInt(1));
+            }
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override

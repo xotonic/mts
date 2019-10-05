@@ -31,10 +31,13 @@ Please put your work on github or bitbucket.
 Where was 2 options on how to represent the codes in SQL schema:
  - Store values as `ENUM`
  - Store them in a separate EAV table
-Due to a few amount of currently supported currencies the second
-way has been considered more appropriate.
+ - Store its in the application layer
+The 3rd option might lead to inconsistency of the data
+due to potential bugs in application logic.
 Use of the 1st option would lead to a lot of ALTER TYPE
 operations in future which involves high risks and reduces flexibility.
+Due to a few amount of currently supported currencies the second
+way has been considered more appropriate.
 
 Also, assume the similar implementation of the operation in PostgreSQL:
 >The problem is that changing the member list for an ENUM column

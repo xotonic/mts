@@ -2,16 +2,23 @@ package com.revolut.mts.service;
 
 
 import com.revolut.mts.dto.*;
+import com.revolut.mts.http.HResponse;
+import com.revolut.mts.http.RequestContext;
 
 import java.util.Currency;
 import java.util.List;
 
 public interface MoneyTransferService {
-    Body<Transaction> send(String userName, String recipient, MoneyAmount amount);
 
-    Body<Deposit> deposit(String userName, MoneyAmount amount);
+    HResponse<Body<Transaction>> send(RequestContext ctx,
+                                      String userName, String recipient, MoneyAmount amount) throws Exception;
 
-    Body<Transaction> convertCurrencies(String username, MoneyAmount amount, Currency target);
+    HResponse<Body<Deposit>> deposit(RequestContext ctx,
+                                     String userName, MoneyAmount amount) throws Exception;
 
-    Body<List<Transaction>> getTransactions(String userName, TransactionQuery query);
+    HResponse<Body<Transaction>> convertCurrencies(RequestContext ctx,
+                                                   String username, MoneyAmount amount, Currency target) throws Exception;
+
+    HResponse<Body<List<Transaction>>> getTransactions(RequestContext ctx,
+                                                       String userName, TransactionQuery query) throws Exception;
 }
