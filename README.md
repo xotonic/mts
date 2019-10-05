@@ -52,3 +52,7 @@ Also, assume the similar implementation of the operation in PostgreSQL:
 >is a high priority feature.)
 
 [Source](https://stackoverflow.com/a/31308166/4186817)
+
+### Why don't utilize java.util.Currency?
+
+The class does not have cryptocurrencies codes

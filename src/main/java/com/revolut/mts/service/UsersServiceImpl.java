@@ -5,7 +5,6 @@ import com.revolut.mts.dto.Body;
 import com.revolut.mts.dto.EmptyBody;
 import com.revolut.mts.dto.MoneyAmount;
 import com.revolut.mts.http.HResponse;
-import com.revolut.mts.http.HStatus;
 import com.revolut.mts.http.RequestContext;
 
 import java.sql.SQLException;
@@ -28,11 +27,10 @@ public class UsersServiceImpl implements UsersService {
             stmt.setString(1, userName);
 
             stmt.executeUpdate();
-
+            return ctx.ok(new EmptyBody());
         } catch (SQLIntegrityConstraintViolationException e) {
-            return ctx.error(HStatus.CONFICT, "The user already exists");
+            return ctx.conflict("The user already exists");
         }
-        return ctx.ok(new EmptyBody());
     }
 
     @Override

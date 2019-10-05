@@ -13,7 +13,7 @@ public interface MoneyTransferService {
     HResponse<Body<Transaction>> send(RequestContext ctx,
                                       String userName, String recipient, MoneyAmount amount) throws Exception;
 
-    HResponse<Body<Deposit>> deposit(RequestContext ctx,
+    HResponse<EmptyBody> deposit(RequestContext ctx,
                                      String userName, MoneyAmount amount) throws Exception;
 
     HResponse<Body<Transaction>> convertCurrencies(RequestContext ctx,
