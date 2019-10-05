@@ -1,15 +1,19 @@
 package com.revolut.mts.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.Objects;
 
 final public class MoneyAmount {
 
+    @JsonProperty("amount")
     private BigDecimal amount;
-    private Currency currency;
 
-    public MoneyAmount(BigDecimal amount, Currency currency) {
+    @JsonProperty("currency")
+    private String currency;
+
+    public MoneyAmount(BigDecimal amount, String currency) {
         this.amount = amount;
         this.currency = currency;
     }
@@ -18,7 +22,7 @@ final public class MoneyAmount {
         return amount;
     }
 
-    public Currency getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 

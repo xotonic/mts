@@ -47,7 +47,7 @@ public class MoneyTransferServiceImpl implements MoneyTransferService {
                 "INSERT INTO balances(user_id, currency, balance)" +
                 "VALUES ((SELECT id FROM users WHERE name = ?), ?, ?)");
         stmt.setString(1, userName);
-        stmt.setString(2, amount.getCurrency().getCurrencyCode());
+        stmt.setString(2, amount.getCurrency());
         stmt.setBigDecimal(3, amount.getAmount());
         return stmt;
     }

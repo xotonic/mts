@@ -26,7 +26,7 @@ class MoneyTransferServiceTest {
         usersService.createUser(ctx, "tester");
 
         var rs = mtService.deposit(ctx, "tester",
-                new MoneyAmount(new BigDecimal(1.0), Currency.getInstance("USD")));
+                new MoneyAmount(new BigDecimal(1.0), "USD"));
 
         assertEquals(NanoHTTPD.Response.Status.OK, rs.getResponse().getStatus());
     }
@@ -37,7 +37,7 @@ class MoneyTransferServiceTest {
         var ctx = new TestContext();
 
         var rs = mtService.deposit(ctx, "tester",
-                new MoneyAmount(new BigDecimal(1.0), Currency.getInstance("USD")));
+                new MoneyAmount(new BigDecimal(1.0), "USD"));
 
         assertEquals(NanoHTTPD.Response.Status.NOT_FOUND, rs.getResponse().getStatus());
     }
