@@ -22,7 +22,7 @@ public class Application {
         try (var ignored = app.start(new MariaDB())) {
             logger.info("Application started");
         } catch (Exception e) {
-            logger.fatal("Failed to run application", e);
+            logger.fatal("Failed to launch application", e);
         }
     }
 
