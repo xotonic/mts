@@ -1,13 +1,5 @@
-
-
-
-/*DROP DATABASE IF EXISTS mts;
-
-
-CREATE DATABASE mts;
-USE mts;
-*/
-##################### << TEST
+# This database is memory-only
+# The daemon creates some temporary dirs though
 
 SET default_storage_engine=MEMORY;
 
@@ -54,6 +46,10 @@ CREATE TABLE IF NOT EXISTS transactions
 
 
 INSERT INTO currencies(code) VALUES ('USD'), ('EUR'), ('BTC'), ('ETH');
+
+# Atomically swaps balances between two account
+# Updates the transaction state, making impossible to call it twice
+# with the same txid
 
 DELIMITER $
 CREATE PROCEDURE commit_tx(IN txid INTEGER)
@@ -117,54 +113,3 @@ BEGIN
 
 END $
 DELIMITER ;
-
-########################### >> TEST
-
-/*INSERT INTO users(name) VALUES ('tester1'), ('tester2');
-
-INSERT INTO balances(user_id, currency, balance) SELECT id, 'USD', 2.0 FROM users WHERE name = 'tester1';
-
-# Money send
-# Happy path
-INSERT INTO transactions(sender_id, receiver_id, status, time_created, src_amount, src_currency, dst_amount, dst_currency )
-SELECT u1.id, u2.id, 'new', NOW(), 1.0, 'USD', 1.0, 'EUR'  FROM users u1 JOIN users u2 ON u1.id != u2.id
-WHERE u1.name = 'tester1' OR u2.name = 'tester2';
-
-CALL commit_tx(LAST_INSERT_ID());
-*/
-# Wrong sender. Must rollback
-
-/*
-INSERT INTO transactions(sender_id, receiver_id, status, time_created, dst_currency, dst_amount, src_currency, src_amount)
-VALUES ((SELECT id FROM users WHERE name = 't1ester1'),
-        (SELECT id FROM users WHERE name = 'tester2'), 'new', NOW(), 'EUR', 1.0, 'USD', 1.0);
-
-CALL commit_tx(LAST_INSERT_ID());
-*/
-
-# Wrong receiver. Must rollback.
-/*INSERT INTO transactions(sender_id, receiver_id, status, time_created, dst_currency, dst_amount, src_currency, src_amount)
-VALUES ((SELECT id FROM users WHERE name = 'tester1'),
-        (SELECT id FROM users WHERE name = 'tsdester2'), 'new', NOW(), 'EUR', 1.0, 'USD', 1.0);
-
-CALL commit_tx(LAST_INSERT_ID());
-*/
-
-# Wrong currency. Most rollback
-/*INSERT INTO transactions(sender_id, receiver_id, status, time_created, dst_currency, dst_amount, src_currency, src_amount)
-VALUES ((SELECT id FROM users WHERE name = 'tester1'),
-        (SELECT id FROM users WHERE name = 'tester2'), 'new', NOW(), 'RUB', 1.0, 'USD', 1.0);
-
-CALL commit_tx(LAST_INSERT_ID());
-*/
-# Wrong currency. Most rollback
-# CALL send('tester1', 1.0, 'USD', 'tester2', 1.0, 'LUX');
-
-
-# GetWallet
-# SELECT currency, balance FROM balances JOIN users u on balances.user_id = u.id WHERE u.name = 'tester1';
-
-# DEBUG
-
-# select * from balances;
-
