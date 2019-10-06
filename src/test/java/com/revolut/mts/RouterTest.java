@@ -1,9 +1,6 @@
 package com.revolut.mts;
 
-import com.revolut.mts.http.HMethod;
-import com.revolut.mts.http.HStatus;
-import com.revolut.mts.http.SimpleRouter;
-import com.revolut.mts.util.TestContext;
+import com.revolut.mts.http.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +16,8 @@ class RouterTest {
         });
         final var handler = router.route(HMethod.GET, "test");
         assertTrue(handler.exists());
-        assertEquals(200, handler.getHandler().handle(new TestContext())
+        assertEquals(200, handler.getHandler()
+                .handle(new RequestContextImpl(new ResponseProviderImpl()))
                 .getResponse().getStatus().getRequestStatus()
         );
     }

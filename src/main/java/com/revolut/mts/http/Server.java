@@ -1,8 +1,5 @@
 package com.revolut.mts.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.revolut.mts.dto.Body;
 import com.revolut.mts.http.routing.Router;
 import fi.iki.elonen.NanoHTTPD;
 import org.apache.logging.log4j.LogManager;
@@ -14,9 +11,6 @@ public class Server extends NanoHTTPD implements AutoCloseable {
 
     private static final Logger logger = LogManager.getLogger(Server.class);
 
-    private static String MIME_TYPE_JSON = "application/json";
-
-    private ObjectMapper jsonMapper;
     private Router router;
 
     public Server(Router router, int port) throws IOException {
@@ -24,8 +18,6 @@ public class Server extends NanoHTTPD implements AutoCloseable {
 
         this.router = router;
 
-        jsonMapper = new ObjectMapper();
-        jsonMapper.registerModule(new JavaTimeModule());
 
         start();
     }
@@ -40,17 +32,7 @@ public class Server extends NanoHTTPD implements AutoCloseable {
 
     private Response serveInternal(IHTTPSession session) {
         try {
-            final var responseProvider = new ResponseProvider() {
-                @Override
-                public <T> HResponse<T> respond(HStatus status, T body) {
-                    return new HResponse<>(response(status, body));
-                }
-
-                @Override
-                public <T> HResponse<T> error(HStatus status, String message) {
-                    return new HResponse<>(absoluteError(status, message));
-                }
-            };
+            final var responseProvider = new ResponseProviderImpl();
             var method = HMethod.map(session.getMethod());
             var result = router.route(method, session.getUri());
             final var context = new RequestContextImpl(responseProvider);
@@ -59,31 +41,14 @@ public class Server extends NanoHTTPD implements AutoCloseable {
             }
             return result.getHandler().handle(context).getResponse();
         } catch (Exception e) {
-            return absoluteError(HStatus.INTERNAL_ERROR);
+            return HResponse.createError(HStatus.INTERNAL_ERROR).getResponse();
         }
     }
 
-    private <T> Response response(HStatus code, T body) {
-        try {
-            var response = new Body<>(body);
-            var result = jsonMapper.writeValueAsString(response);
-            return newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON, result);
-        } catch (Exception e) {
-            return absoluteError(HStatus.INTERNAL_ERROR);
-        }
-    }
-
-    private Response absoluteError(HStatus code, String message) {
-        return newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON,
-                String.format("{\"result\":null,\"error\":{\"code\":%d,\"message:\":\"%s\"}}",
-                        code.getRequestStatus(), message));
-    }
-    private Response absoluteError(HStatus code) {
-        return absoluteError(code, code.getDescription());
-    }
 
     @Override
     public void close() {
         stop();
     }
+
 }

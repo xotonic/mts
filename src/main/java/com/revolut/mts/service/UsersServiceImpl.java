@@ -7,8 +7,11 @@ import com.revolut.mts.dto.MoneyAmount;
 import com.revolut.mts.http.HResponse;
 import com.revolut.mts.http.RequestContext;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +50,24 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public HResponse<Body<List<MoneyAmount>>> getWallet(RequestContext ctx, String userName) {
-        return null;
+    public HResponse<Body<List<MoneyAmount>>> getWallet(RequestContext ctx,
+                                                        String userName) throws Exception {
+        try (var conn = db.connection();
+             var stmt = createWalletStatement(conn, userName);
+             var rs = stmt.executeQuery()) {
+            var list = new ArrayList<MoneyAmount>();
+            while (rs.next()) {
+                var amount = new MoneyAmount(rs.getBigDecimal(1), rs.getString(2));
+                list.add(amount);
+            }
+            return ctx.ok(new Body<>(list));
+        }
+    }
+
+    private PreparedStatement createWalletStatement(Connection conn, String username) throws SQLException {
+        var stmt = conn.prepareStatement("SELECT currency, balance " +
+                "FROM balances JOIN users u on balances.user_id = u.id WHERE u.name = ?");
+        stmt.setString(1, username);
+        return stmt;
     }
 }

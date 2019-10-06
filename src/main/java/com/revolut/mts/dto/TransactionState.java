@@ -1,5 +1,12 @@
 package com.revolut.mts.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum TransactionState {
-    NEW, PENDING, FINISHED
+    @JsonProperty("new")
+    NEW,
+    @JsonProperty("pending")
+    PENDING,
+    @JsonProperty("finished")
+    FINISHED
 }

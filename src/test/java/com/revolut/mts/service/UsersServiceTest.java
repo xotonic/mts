@@ -3,8 +3,9 @@ package com.revolut.mts.service;
 import com.revolut.mts.Database;
 import com.revolut.mts.dto.EmptyBody;
 import com.revolut.mts.http.HStatus;
+import com.revolut.mts.http.RequestContextImpl;
+import com.revolut.mts.http.ResponseProviderImpl;
 import com.revolut.mts.util.DatabaseExtension;
-import com.revolut.mts.util.TestContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -16,28 +17,42 @@ class UsersServiceTest {
     @Test
     void happyPath(Database db) throws Exception {
         final var service = new UsersServiceImpl(db);
-        var ctx = new TestContext();
-        service.createUser(ctx, "tester");
-        assertEquals(new EmptyBody(), ctx.getLastBody(EmptyBody.class));
+        var ctx = new RequestContextImpl(new ResponseProviderImpl());
+
+        var rs = service.createUser(ctx, "tester");
+
+        assertEquals(new EmptyBody(), rs.getBody());
         final var userId = service.getUser("tester");
         assertTrue(userId.isPresent());
+    }
+
+    @Test
+    void walletIsEmptyWhenUserIsNew(Database db) throws Exception {
+
+        final var service = new UsersServiceImpl(db);
+        var ctx = new RequestContextImpl(new ResponseProviderImpl());
+        service.createUser(ctx, "tester");
+
+        var rs = service.getWallet(ctx, "tester");
+
+        assertEquals(HStatus.OK, rs.getStatus());
+        assertTrue(rs.getBody().result().isEmpty());
     }
 
     @Test
     void createSameSameUser(Database db) throws Exception {
         final var service = new UsersServiceImpl(db);
 
-        var ctx = new TestContext();
+        var ctx = new RequestContextImpl(new ResponseProviderImpl());
 
-        service.createUser(ctx, "tester");
-        assertEquals(new EmptyBody(), ctx.getLastBody(EmptyBody.class));
+        var rs = service.createUser(ctx, "tester");
+        assertEquals(new EmptyBody(), rs.getBody());
 
-        service.createUser(ctx, "tester");
+        rs = service.createUser(ctx, "tester");
 
-        assertFalse(ctx.isSuccess());
+        assertFalse(rs.isSuccess());
 
-        assertEquals(HStatus.CONFICT, ctx.getLastStatus());
-        assertEquals("The user already exists", ctx.getLastErrorMessage());
+        assertEquals(HStatus.CONFLICT, rs.getStatus());
+        assertEquals("The user already exists", rs.getErrorMessage());
     }
-
 }
