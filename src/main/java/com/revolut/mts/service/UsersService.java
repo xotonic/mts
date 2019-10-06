@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface UsersService {
     HResponse<Body<User>> createUser(RequestContext ctx, String userName) throws Exception;
     HResponse<Body<UserProfile>> getUser(RequestContext ctx, String userName) throws Exception;
-
     Optional<Integer> checkUserExists(String name) throws  Exception;
+    boolean isBalanceSufficient(Integer userId, MoneyAmount minAmount) throws Exception;
 }

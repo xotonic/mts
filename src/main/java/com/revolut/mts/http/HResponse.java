@@ -39,7 +39,7 @@ public class HResponse<T> {
 
     private static HttpResponse rawError(HStatus status, String message) {
         return new HttpResponse(status, MIME_TYPE_JSON,
-                String.format("{\"result\":null,\"error\":{\"code\":%d,\"message:\":\"%s\"}}",
+                String.format("{\"result\":null,\"error\":{\"code\":%d,\"message\":\"%s\"}}",
                         status.code(), message));
     }
 

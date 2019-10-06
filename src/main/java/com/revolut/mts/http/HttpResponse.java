@@ -28,14 +28,6 @@ public class HttpResponse {
         return status;
     }
 
-    public String getMime() {
-        return mime;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
     public void write(HttpExchange exchange) throws IOException {
         final var headers = exchange.getResponseHeaders();
         headers.add("Content-Type", mime);

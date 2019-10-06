@@ -36,8 +36,12 @@ The 3rd option might lead to inconsistency of the data
 due to potential bugs in application logic.
 Use of the 1st option would lead to a lot of ALTER TYPE
 operations in future which involves high risks and reduces flexibility.
-Due to a few amount of currently supported currencies the second
-way has been considered more appropriate.
+
+
+Due to a few amount of currently supported currencies the hybrid of 1st and 2nd 
+ways has been considered to be more appropriate. Currently, MySQL MEMORY engine does not
+support foreign keys checks on inserts and updates so the testing for existence of 
+a currency is moved on application layer.
 
 Also, assume the similar implementation of the operation in PostgreSQL:
 >The problem is that changing the member list for an ENUM column
@@ -53,6 +57,3 @@ Also, assume the similar implementation of the operation in PostgreSQL:
 
 [Source](https://stackoverflow.com/a/31308166/4186817)
 
-### Why don't utilize java.util.Currency?
-
-The class does not have cryptocurrencies codes

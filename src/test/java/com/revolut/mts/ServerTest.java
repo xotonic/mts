@@ -68,4 +68,20 @@ class ServerTest {
                     .body("result.id", equalTo(1));
         }
     }
+
+    @Test
+    void testInternalErrorHandling() throws Exception {
+
+        var router = new SimpleRouter();
+        router.Get("/status", c ->  { throw new RuntimeException(); });
+
+        try (var ignored = new Server(router, 8080)) {
+            when().get("/status")
+                    .then()
+                    .statusCode(500)
+                    .body("error.code", equalTo(500))
+                    .body("error.message", equalTo("Internal error"))
+            ;
+        }
+    }
 }

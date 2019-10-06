@@ -111,6 +111,8 @@ BEGIN
     VALUES (_receiver_id, _dst_currency, _dst_amount)
     ON DUPLICATE KEY UPDATE balance = balance + _dst_amount;
 
+    UPDATE transactions SET status = 'finished' WHERE id = txid;
+
     COMMIT;
 
 END $
@@ -165,3 +167,4 @@ CALL commit_tx(LAST_INSERT_ID());
 # DEBUG
 
 # select * from balances;
+

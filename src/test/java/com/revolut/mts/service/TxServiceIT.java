@@ -18,6 +18,16 @@ import static org.hamcrest.Matchers.equalTo;
 @ExtendWith({DatabaseExtension.class})
 class TxServiceIT {
 
+    private void createUser(String user) {
+        given().body(new NewUser(user)).when().post("/users").then().statusCode(201);
+    }
+
+    private void depositFunds(String user, double amount, String currency) {
+        given().body(new Deposit(user, new MoneyAmount(new BigDecimal(amount), currency)))
+                .when().post("/deposit")
+                .then().statusCode(201);
+    }
+
     @Test
     void happyPath(Database db) throws Exception {
 
@@ -49,13 +59,87 @@ class TxServiceIT {
         }
     }
 
-    private void createUser(String user) {
-        given().body(new NewUser(user)).when().post("/users").then().statusCode(201);
+    @Test
+    void nonExistingSender(Database db) throws Exception {
+
+        try (var ignored = new Application().start(db)) {
+            createUser("bob");
+            given().body(new NewTransactionBuilder()
+                .setSender("alice")
+                .setReceiver("bob")
+                .setSourceMoney(2.0, "USD")
+                .setDestinationMoney(2.0, "USD")
+                .createNewTransaction())
+                .when().post("/transactions")
+                .then().statusCode(404);
+        }
+    }
+    @Test
+    void nonExistingReceiver(Database db) throws Exception {
+
+        try (var ignored = new Application().start(db)) {
+            createUser("alice");
+            depositFunds("alice", 4.0, "USD");
+            given().body(new NewTransactionBuilder()
+                    .setSender("alice")
+                    .setReceiver("bob")
+                    .setSourceMoney(2.0, "USD")
+                    .setDestinationMoney(2.0, "USD")
+                    .createNewTransaction())
+                    .when().post("/transactions")
+                    .then().statusCode(404);
+        }
     }
 
-    private void depositFunds(String user, double amount, String currency) {
-        given().body(new Deposit(user, new MoneyAmount(new BigDecimal(amount), currency)))
-                .when().post("/deposit")
-                .then().statusCode(201);
+    @Test
+    void wrongCurrencies(Database db) throws Exception {
+
+        try (var ignored = new Application().start(db)) {
+            createUser("alice");
+            createUser("bob");
+            depositFunds("alice", 4.0, "USD");
+            given().body(new NewTransactionBuilder()
+                    .setSender("alice")
+                    .setReceiver("bob")
+                    .setSourceMoney(2.0, "RUB") // does not exist
+                    .setDestinationMoney(2.0, "USD")
+                    .createNewTransaction())
+                    .when().post("/transactions")
+                    .then().statusCode(404);
+        }
+    }
+
+    @Test
+    void insufficientBalance(Database db) throws Exception {
+        try (var ignored = new Application().start(db)) {
+            createUser("alice");
+            createUser("bob");
+            depositFunds("alice", 1.0, "USD");
+            given().body(new NewTransactionBuilder()
+                    .setSender("alice")
+                    .setReceiver("bob")
+                    .setSourceMoney(2.0, "USD")
+                    .setDestinationMoney(2.0, "USD")
+                    .createNewTransaction())
+                    .when().post("/transactions")
+                    .then().statusCode(400);
+        }
+
+    }
+    @Test
+    void badDestinationAmount(Database db) throws Exception {
+        try (var ignored = new Application().start(db)) {
+            createUser("alice");
+            createUser("bob");
+            depositFunds("alice", 4.0, "USD");
+            given().body(new NewTransactionBuilder()
+                    .setSender("alice")
+                    .setReceiver("bob")
+                    .setSourceMoney(2.0, "USD")
+                    .setDestinationMoney(-1.0, "USD")
+                    .createNewTransaction())
+                    .when().post("/transactions")
+                    .then().statusCode(400);
+        }
     }
 }

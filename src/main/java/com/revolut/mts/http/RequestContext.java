@@ -24,9 +24,6 @@ public interface RequestContext extends ResponseProvider, RoutePath, RequestProv
     default <T> HResponse<T> notFound(String message) {
         return error(HStatus.NOT_FOUND, message);
     }
-    default <T> HResponse<T> internalError(String message) {
-        return error(HStatus.INTERNAL_ERROR, message);
-    }
     default <T> HResponse<T> badRequest(String message) {
         return error(HStatus.BAD_REQUEST, message);
     }

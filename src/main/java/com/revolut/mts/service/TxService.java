@@ -15,7 +15,4 @@ public interface TxService {
     HResponse<EmptyBody> commitTransaction(RequestContext ctx, Integer id) throws Exception;
 
     HResponse<EmptyBody> deposit(RequestContext ctx, Deposit deposit) throws Exception;
-
-    HResponse<Body<List<Transaction>>> getTransactions(RequestContext ctx,
-                                                          String userName, TransactionQuery query) throws Exception;
 }

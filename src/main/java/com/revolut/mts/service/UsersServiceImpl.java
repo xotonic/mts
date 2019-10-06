@@ -50,6 +50,26 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
+    public boolean isBalanceSufficient(Integer userId, MoneyAmount minAmount)
+            throws SQLException {
+        try (var conn = db.connection();
+             var stmt = createBalanceCheckStatement(conn, userId, minAmount);
+             var rs = stmt.executeQuery()) {
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+
+    private PreparedStatement createBalanceCheckStatement(
+            Connection connection, Integer userId, MoneyAmount minAmount) throws SQLException {
+       var stmt = connection.prepareStatement(
+               "SELECT COUNT(*) FROM balances WHERE user_id = ? AND currency = ? AND balance >= ?");
+       stmt.setInt(1, userId);
+       stmt.setString(2, minAmount.getCurrency());
+       stmt.setBigDecimal(3, minAmount.getAmount());
+       return stmt;
+    }
+
+    @Override
     public HResponse<Body<UserProfile>> getUser(RequestContext ctx, String userName) throws Exception {
         var optId = checkUserExists(userName);
         if (optId.isEmpty()) {

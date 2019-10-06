@@ -4,11 +4,12 @@ import com.revolut.mts.Database;
 import com.revolut.mts.dto.*;
 import com.revolut.mts.http.HResponse;
 import com.revolut.mts.http.RequestContext;
+import com.revolut.mts.util.Currencies;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.sql.*;
-import java.util.List;
 
 public class TxServiceImpl implements TxService {
     private static final Logger logger = LogManager.getLogger(TxServiceImpl.class);
@@ -23,6 +24,31 @@ public class TxServiceImpl implements TxService {
 
     @Override
     public HResponse<Body<TransactionId>> createTransaction(RequestContext ctx, NewTransaction tx) throws Exception {
+
+        var receiverId = usersService.checkUserExists(tx.getReceiver());
+        if (receiverId.isEmpty()) {
+            return ctx.notFound("Receiver not found");
+        }
+
+        var senderId = usersService.checkUserExists(tx.getSender());
+        if (senderId.isEmpty()) {
+            return ctx.notFound("Sender not found");
+        }
+
+        final var srcMoney = tx.getSourceMoney();
+        final var dstMoney = tx.getDestinationMoney();
+        if (!Currencies.validateCurrencies(dstMoney, srcMoney)) {
+            return ctx.notFound("Currency code not found");
+        }
+
+        if (!usersService.isBalanceSufficient(senderId.get(), srcMoney)) {
+            return ctx.badRequest("Insufficient balance");
+        }
+
+        if (dstMoney.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            return ctx.badRequest("Bad destination amount");
+        }
+
         try (var conn = db.connection();
              var stmt = createAndExecuteCreateStatement(conn, tx);
              var rs = stmt.getGeneratedKeys()) {
@@ -70,7 +96,17 @@ public class TxServiceImpl implements TxService {
     }
 
     @Override
-    public HResponse<EmptyBody> deposit(RequestContext ctx, Deposit deposit) throws SQLException {
+    public HResponse<EmptyBody> deposit(RequestContext ctx, Deposit deposit) throws Exception {
+
+        var receiverId = usersService.checkUserExists(deposit.getUserName());
+        if (receiverId.isEmpty()) {
+            return ctx.notFound("User not found");
+        }
+
+        if (deposit.getAmount().getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            return ctx.badRequest("Bad deposit amount");
+        }
+
         try (var conn = db.connection();
              var stmt = createDepositStatement(conn, deposit);
              var ignored = stmt.executeQuery()) {
@@ -88,11 +124,5 @@ public class TxServiceImpl implements TxService {
         stmt.setString(2, deposit.getAmount().getCurrency());
         stmt.setBigDecimal(3, deposit.getAmount().getAmount());
         return stmt;
-    }
-
-    @Override
-    public HResponse<Body<List<Transaction>>> getTransactions(RequestContext ctx,
-                                                                 String userName, TransactionQuery query) {
-        throw new java.lang.UnsupportedOperationException();
     }
 }
