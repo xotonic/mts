@@ -18,7 +18,7 @@ class RouterTest {
         assertTrue(handler.exists());
         assertEquals(200, handler.getHandler()
                 .handle(new RequestContextImpl(new ResponseProviderImpl()))
-                .getResponse().getStatus().getRequestStatus()
+                .getResponse().getStatus().code()
         );
     }
 }

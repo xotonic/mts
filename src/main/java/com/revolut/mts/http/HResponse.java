@@ -3,7 +3,6 @@ package com.revolut.mts.http;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.revolut.mts.dto.Body;
-import fi.iki.elonen.NanoHTTPD;
 
 import java.util.StringJoiner;
 
@@ -15,7 +14,7 @@ public class HResponse<T> {
     private final T body;
     private final boolean isError;
     private final String errorMessage;
-    private NanoHTTPD.Response response;
+    private HttpResponse response;
 
     private HResponse(HStatus status, T body, boolean error, String errorMessage) {
         this.status = status;
@@ -35,17 +34,17 @@ public class HResponse<T> {
     }
 
     public static <R> HResponse<R> createError(HStatus status) {
-        return new HResponse<>(status, null, true, status.getDescription());
+        return new HResponse<>(status, null, true, status.description());
     }
 
-    private static NanoHTTPD.Response rawError(HStatus code, String message) {
-        return NanoHTTPD.newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON,
+    private static HttpResponse rawError(HStatus status, String message) {
+        return new HttpResponse(status, MIME_TYPE_JSON,
                 String.format("{\"result\":null,\"error\":{\"code\":%d,\"message:\":\"%s\"}}",
-                        code.getRequestStatus(), message));
+                        status.code(), message));
     }
 
-    private static NanoHTTPD.Response rawError(HStatus code) {
-        return rawError(code, code.getDescription());
+    private static HttpResponse rawError(HStatus code) {
+        return rawError(code, code.description());
     }
 
     private void buildHttpResponse() {
@@ -63,7 +62,7 @@ public class HResponse<T> {
         }
     }
 
-    public NanoHTTPD.Response getResponse() {
+    public HttpResponse getResponse() {
         return response;
     }
 
@@ -93,12 +92,12 @@ public class HResponse<T> {
         return this;
     }
 
-    private NanoHTTPD.Response response(HStatus code, T body) {
+    private HttpResponse response(HStatus code, T body) {
         try {
             var response = new Body<>(body);
             initObjectMapper();
             var result = jsonMapper.writeValueAsString(response);
-            return NanoHTTPD.newFixedLengthResponse(code.getStatus(), MIME_TYPE_JSON, result);
+            return new HttpResponse(code, MIME_TYPE_JSON, result);
         } catch (Exception e) {
             return rawError(HStatus.INTERNAL_ERROR);
         }

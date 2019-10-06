@@ -8,6 +8,9 @@ final public class Deposit {
     @JsonProperty("amount")
     private MoneyAmount amount;
 
+    public Deposit() {
+    }
+
     public Deposit(String userName, MoneyAmount amount) {
         this.userName = userName;
         this.amount = amount;

@@ -42,32 +42,32 @@ public class TxServiceIT {
                 ctx -> txService.commitTransaction(ctx, ctx.getInt(0)));
 
 
-        var server = new Server(router, 8080);
+        try (var server = new Server(router, 8080)) {
 
-        createUser(client, "alice");
-        createUser(client, "bob");
+            createUser(client, "alice");
+            createUser(client, "bob");
 
-        depositFunds(client, "alice", 4.0, "USD");
+            depositFunds(client, "alice", 4.0, "USD");
 
-        var tx = new JSONObject()
-                .put("sender", "alice")
-                .put("receiver", "bob")
-                .put("source_money", amount(2.0, "USD"))
-                .put("destination_money", amount(2.0, "USD"));
-        var rs = post(client, "/transactions", tx);
-        assertEquals(201, rs.statusCode());
+            var tx = new JSONObject()
+                    .put("sender", "alice")
+                    .put("receiver", "bob")
+                    .put("source_money", amount(2.0, "USD"))
+                    .put("destination_money", amount(2.0, "USD"));
+            var rs = post(client, "/transactions", tx);
+            assertEquals(201, rs.statusCode());
 
-        var txid = new JSONObject(rs.body()).getInt("result");
+            var txid = new JSONObject(rs.body()).getInt("result");
 
-        rs = put(client, "/transactions/" + txid, new JSONObject());
-        assertEquals(200, rs.statusCode());
-        server.stop();
+            rs = put(client, "/transactions/" + txid, new JSONObject());
+            assertEquals(200, rs.statusCode());
+        }
     }
 
     private void createUser(HttpClient client, String user) throws Exception {
         var body = new JSONObject();
         body.put("name", user);
-        assertEquals(200, post(client, "/users", body).statusCode());
+        assertEquals(201, post(client, "/users", body).statusCode());
     }
 
     private void depositFunds(HttpClient client, String user, double amount, String currency) throws Exception {

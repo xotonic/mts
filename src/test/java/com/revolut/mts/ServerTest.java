@@ -37,12 +37,12 @@ class ServerTest {
         var router = new SimpleRouter();
         router.Get("/status", c -> c.ok(true));
 
-        var server = new Server(router, 8080);
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONAssert.assertEquals(
-                "{\"result\":true,\"error\":null}",
-                response.body(), false);
-        server.stop();
+        try (var server = new Server(router, 8080)) {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONAssert.assertEquals(
+                    "{\"result\":true,\"error\":null}",
+                    response.body(), false);
+        }
 
     }
 
@@ -52,10 +52,11 @@ class ServerTest {
                 .GET()
                 .uri(URI.create("http://localhost:8080/status"))
                 .build();
-        var server = new Server(new SimpleRouter(), 8080);
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(404, response.statusCode());
-        server.stop();
+        try (var server = new Server(new SimpleRouter(), 8080)) {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(404, response.statusCode());
+            server.stop();
+        }
     }
 
     @Test
@@ -68,13 +69,13 @@ class ServerTest {
         var router = new SimpleRouter();
         router.Get("/status", c -> c.ok(true));
 
-        var server = new Server(router, 8080);
-        final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        final var allowed = response.headers().firstValue("allow");
+        try (var server = new Server(router, 8080)) {
+            final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final var allowed = response.headers().firstValue("allow");
 
-        assertEquals(405, response.statusCode());
-        allowed.ifPresentOrElse(v -> assertEquals("GET", v), Assertions::fail);
-        server.stop();
+            assertEquals(405, response.statusCode());
+            allowed.ifPresentOrElse(v -> assertEquals("GET", v), Assertions::fail);
+        }
     }
 
     @Test
@@ -90,27 +91,27 @@ class ServerTest {
         var router = new SimpleRouter();
         router.Post("/test", c -> c.ok(c.body(User.class)));
 
-        var server = new Server(router, 8080);
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        var expected = new JSONObject().put("result", requestBody).put("result", null);
-        JSONAssert.assertEquals(expected.toString(), response.body(), false);
-        server.stop();
+        try (var server = new Server(router, 8080)) {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            var expected = new JSONObject().put("result", requestBody).put("result", null);
+            JSONAssert.assertEquals(expected.toString(), response.body(), false);
+        }
     }
 
     @Test
     void requestBody1(HttpClient client) throws Exception {
 
         var router = new SimpleRouter();
-        router.Post("/test", c -> c.ok(new Body<>(c.body(User.class))));
+        router.Post("/test", c -> c.ok(c.body(User.class)));
 
-        var server = new Server(router, 8080);
-
-        given()
-            .contentType(ContentType.JSON)
-            .body(new User("alice"))
-        .when()
-            .post("/test")
-        .then()
-            .body("result", equalTo(5));
+        try (var ignored = new Server(router, 8080)) {
+            given()
+                    .contentType(ContentType.JSON)
+                    .body(new User("alice"))
+                    .when()
+                    .post("/test")
+                    .then()
+                    .body("result.name", equalTo("alice"));
+        }
     }
 }

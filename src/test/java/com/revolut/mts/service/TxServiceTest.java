@@ -8,7 +8,6 @@ import com.revolut.mts.http.HStatus;
 import com.revolut.mts.http.RequestContextImpl;
 import com.revolut.mts.http.ResponseProviderImpl;
 import com.revolut.mts.util.DatabaseExtension;
-import fi.iki.elonen.NanoHTTPD;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -30,7 +29,7 @@ class TxServiceTest {
 
         var rs = mtService.deposit(ctx, deposit);
 
-        assertEquals(NanoHTTPD.Response.Status.OK, rs.getResponse().getStatus());
+        assertEquals(201, rs.getResponse().getStatus().code());
         final var wallet = usersService.getWallet(ctx, "tester").getBody().result().get(0);
         assertEquals("USD", wallet.getCurrency());
         assertEquals(new BigDecimal(1.0), wallet.getAmount().stripTrailingZeros());

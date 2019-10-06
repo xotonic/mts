@@ -22,7 +22,6 @@ public class Application {
         router.Put("/users/{}", c -> usersService.createUser(c, c.getString(0)));
 
         try (var server = new Server(router, 8080)) {
-            logger.info("Server started on {}", server.getListeningPort());
         } catch (Exception e) {
             logger.fatal("Failed to run application", e);
         }

@@ -24,15 +24,15 @@ public class UserServiceIT {
         var service = new UsersServiceImpl(db);
         var router = new SimpleRouter();
         router.Put("/users/{string}", ctx -> service.createUser(ctx, ctx.getString(0)));
-        var server = new Server(router, 8080);
-        var request = HttpRequest.newBuilder()
-                .PUT(HttpRequest.BodyPublishers.ofString("{}"))
-                .uri(URI.create("http://localhost:8080/users/tester"))
-                .build();
-        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
-        final var userId = service.getUser("tester");
-        assertTrue(userId.isPresent());
-        server.stop();
+        try (var server = new Server(router, 8080)) {
+            var request = HttpRequest.newBuilder()
+                    .PUT(HttpRequest.BodyPublishers.ofString("{}"))
+                    .uri(URI.create("http://localhost:8080/users/tester"))
+                    .build();
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            assertEquals(201, response.statusCode());
+            final var userId = service.getUser("tester");
+            assertTrue(userId.isPresent());
+        }
     }
 }

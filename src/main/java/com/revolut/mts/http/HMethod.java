@@ -1,22 +1,20 @@
 package com.revolut.mts.http;
 
-import fi.iki.elonen.NanoHTTPD;
-
 public enum HMethod {
-   GET(NanoHTTPD.Method.GET),
-   POST(NanoHTTPD.Method.POST),
-   PUT(NanoHTTPD.Method.PUT),
+   GET("GET"),
+   POST("POST"),
+   PUT("PUT"),
 
    UNKNOWN(null)
    ;
 
-   private NanoHTTPD.Method method;
-   HMethod(NanoHTTPD.Method method) {
+   private String method;
+   HMethod(String method) {
       this.method = method;
    }
-   public static HMethod map(NanoHTTPD.Method method) {
+   public static HMethod map(String method) {
       for (var m : values()) {
-         if (m.method.equals(method)) {
+         if (method.equals(m.method)) {
             return m;
          }
       }

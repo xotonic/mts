@@ -1,32 +1,31 @@
 package com.revolut.mts.http;
 
-import fi.iki.elonen.NanoHTTPD;
 
 public enum HStatus {
-    OK(NanoHTTPD.Response.Status.OK),
-    CREATED(NanoHTTPD.Response.Status.CREATED),
-    NOT_FOUND(NanoHTTPD.Response.Status.NOT_FOUND),
-    CONFLICT(NanoHTTPD.Response.Status.CONFLICT),
-    BAD_REQUEST(NanoHTTPD.Response.Status.BAD_REQUEST),
-    METHOD_NOT_ALLOWED(NanoHTTPD.Response.Status.METHOD_NOT_ALLOWED),
-    INTERNAL_ERROR(NanoHTTPD.Response.Status.INTERNAL_ERROR),
-    ;
+    OK(200),
+    CREATED(201),
 
-    NanoHTTPD.Response.IStatus status;
+    BAD_REQUEST(400),
+    NOT_FOUND(404),
+    METHOD_NOT_ALLOWED(405),
+    CONFLICT(409),
 
-    HStatus(NanoHTTPD.Response.IStatus status) {
-        this.status = status;
+    INTERNAL_ERROR(500);
+
+    private int code;
+    private String description;
+
+    HStatus(int status) {
+        this.code = status;
+        this.description = "To do add description";
     }
 
-    public String getDescription() {
-        return status.getDescription();
+    public int code() {
+        return code;
     }
 
-    public int getRequestStatus() {
-        return status.getRequestStatus();
+    public String description() {
+        return description;
     }
 
-    public NanoHTTPD.Response.IStatus getStatus() {
-        return status;
-    }
 }

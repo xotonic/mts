@@ -1,56 +1,70 @@
 package com.revolut.mts.http;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.revolut.mts.http.routing.Router;
-import fi.iki.elonen.NanoHTTPD;
+import com.sun.net.httpserver.HttpContext;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
-public class Server extends NanoHTTPD implements AutoCloseable {
-
+public class Server implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(Server.class);
 
+    private HttpServer server;
+    private HttpContext context;
+
     private Router router;
-    private ObjectMapper objectMapper;
 
     public Server(Router router, int port) throws IOException {
-        super(port);
+
         this.router = router;
 
-        start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+        server = HttpServer.create(new InetSocketAddress(port), 0);
+        context = server.createContext("/");
+        context.setHandler(this::handleRequest);
+        server.start();
+        logger.info("Http server started on port {}", port);
     }
 
-    @Override
-    public Response serve(IHTTPSession session) {
-        logger.info(">>> {}: {}", session.getMethod(), session.getUri());
-        final var response = serveInternal(session);
-        logger.info("<<< {}", response.getStatus().getRequestStatus());
-        return response;
+    private void handleRequest(HttpExchange exchange) {
+        Executors.newSingleThreadExecutor().submit(() -> processResponce(exchange));
     }
 
-    private Response serveInternal(IHTTPSession session) {
+    private void processResponce(HttpExchange exchange) {
         try {
             final var responseProvider = new ResponseProviderImpl();
-            var method = HMethod.map(session.getMethod());
-            var result = router.route(method, session.getUri());
-            final var context = new RequestContextImpl(responseProvider, session.getInputStream());
+            var method = HMethod.map(exchange.getRequestMethod());
+            logger.info(">>> {}", exchange.getRequestURI());
+            var result = router.route(method, exchange.getRequestURI().getPath());
+            final var context = new RequestContextImpl(responseProvider, exchange.getRequestBody());
             if (result.exists()) {
                 context.setPath(result.getPathValues());
             }
-            return result.getHandler().handle(context).getResponse();
+            final var rs = result.getHandler().handle(context).getResponse();
+            rs.write(exchange);
         } catch (Exception e) {
             logger.error("Failed to process request", e);
-            return HResponse.createError(HStatus.INTERNAL_ERROR).getResponse();
+            final var rs = HResponse.createError(HStatus.INTERNAL_ERROR).getResponse();
+            try {
+                rs.write(exchange);
+            } catch (IOException ex) {
+                logger.fatal("Failed to send error response", ex);
+            }
+        } finally {
+            logger.info("<<< {}", exchange.getResponseCode());
         }
     }
 
-
-    @Override
-    public void close() {
-        stop();
+    public void stop() {
+        server.stop(0);
     }
 
+    @Override
+    public void close() throws Exception {
+        stop();
+    }
 }
