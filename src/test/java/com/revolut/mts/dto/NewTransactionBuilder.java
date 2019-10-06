@@ -6,7 +6,7 @@ public class NewTransactionBuilder {
     private String sender;
     private String receiver;
     private MoneyAmount sourceMoney;
-    private MoneyAmount destinationMoney;
+    private String targetCurrency;
 
     public NewTransactionBuilder setSender(String sender) {
         this.sender = sender;
@@ -23,12 +23,12 @@ public class NewTransactionBuilder {
         return this;
     }
 
-    public NewTransactionBuilder setDestinationMoney(double amount, String currency) {
-        this.destinationMoney = new MoneyAmount(new BigDecimal(amount), currency);
+    public NewTransactionBuilder setTargetCurrency(String currency) {
+        targetCurrency = currency;
         return this;
     }
 
     public NewTransaction createNewTransaction() {
-        return new NewTransaction(sender, receiver, sourceMoney, destinationMoney);
+        return new NewTransaction(sender, receiver, sourceMoney, targetCurrency);
     }
 }

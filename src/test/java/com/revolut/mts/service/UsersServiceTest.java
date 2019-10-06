@@ -1,7 +1,6 @@
 package com.revolut.mts.service;
 
 import com.revolut.mts.Database;
-import com.revolut.mts.dto.EmptyBody;
 import com.revolut.mts.http.HStatus;
 import com.revolut.mts.http.RequestContextImpl;
 import com.revolut.mts.http.ResponseProviderImpl;

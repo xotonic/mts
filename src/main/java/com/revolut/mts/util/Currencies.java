@@ -1,8 +1,6 @@
 package com.revolut.mts.util;
 
 
-import com.revolut.mts.dto.MoneyAmount;
-
 public enum Currencies {
     USD("USD"),
     EUR("EUR"),
@@ -24,9 +22,9 @@ public enum Currencies {
         return false;
     }
 
-    public static boolean validateCurrencies(MoneyAmount... moneyAmount) {
-        for (var m : moneyAmount) {
-            if (!Currencies.isSupported(m.getCurrency())) {
+    public static boolean validateCurrencies(String... currencies) {
+        for (var c : currencies) {
+            if (!Currencies.isSupported(c)) {
                 return false;
             }
         }

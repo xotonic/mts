@@ -1,6 +1,9 @@
 package com.revolut.mts.service;
 
-import com.revolut.mts.dto.*;
+import com.revolut.mts.dto.Body;
+import com.revolut.mts.dto.MoneyAmount;
+import com.revolut.mts.dto.User;
+import com.revolut.mts.dto.UserProfile;
 import com.revolut.mts.http.HResponse;
 import com.revolut.mts.http.RequestContext;
 

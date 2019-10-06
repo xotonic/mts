@@ -2,9 +2,10 @@ package com.revolut.mts.service;
 
 import com.revolut.mts.Application;
 import com.revolut.mts.Database;
-import com.revolut.mts.dto.*;
-import com.revolut.mts.http.Server;
-import com.revolut.mts.http.SimpleRouter;
+import com.revolut.mts.dto.Deposit;
+import com.revolut.mts.dto.MoneyAmount;
+import com.revolut.mts.dto.NewTransactionBuilder;
+import com.revolut.mts.dto.NewUser;
 import com.revolut.mts.util.DatabaseExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,7 @@ class TxServiceIT {
                     .setSender("alice")
                     .setReceiver("bob")
                     .setSourceMoney(2.0, "USD")
-                    .setDestinationMoney(2.0, "USD")
+                    .setTargetCurrency("USD")
                     .createNewTransaction())
                     .when().post("/transactions")
                     .then().statusCode(201).body("result.id", equalTo(1))
@@ -68,7 +69,7 @@ class TxServiceIT {
                 .setSender("alice")
                 .setReceiver("bob")
                 .setSourceMoney(2.0, "USD")
-                .setDestinationMoney(2.0, "USD")
+                .setTargetCurrency("USD")
                 .createNewTransaction())
                 .when().post("/transactions")
                 .then().statusCode(404);
@@ -84,7 +85,7 @@ class TxServiceIT {
                     .setSender("alice")
                     .setReceiver("bob")
                     .setSourceMoney(2.0, "USD")
-                    .setDestinationMoney(2.0, "USD")
+                    .setTargetCurrency("USD")
                     .createNewTransaction())
                     .when().post("/transactions")
                     .then().statusCode(404);
@@ -102,7 +103,7 @@ class TxServiceIT {
                     .setSender("alice")
                     .setReceiver("bob")
                     .setSourceMoney(2.0, "RUB") // does not exist
-                    .setDestinationMoney(2.0, "USD")
+                    .setTargetCurrency("USD")
                     .createNewTransaction())
                     .when().post("/transactions")
                     .then().statusCode(404);
@@ -119,27 +120,11 @@ class TxServiceIT {
                     .setSender("alice")
                     .setReceiver("bob")
                     .setSourceMoney(2.0, "USD")
-                    .setDestinationMoney(2.0, "USD")
+                    .setTargetCurrency("USD")
                     .createNewTransaction())
                     .when().post("/transactions")
                     .then().statusCode(400);
         }
 
-    }
-    @Test
-    void badDestinationAmount(Database db) throws Exception {
-        try (var ignored = new Application().start(db)) {
-            createUser("alice");
-            createUser("bob");
-            depositFunds("alice", 4.0, "USD");
-            given().body(new NewTransactionBuilder()
-                    .setSender("alice")
-                    .setReceiver("bob")
-                    .setSourceMoney(2.0, "USD")
-                    .setDestinationMoney(-1.0, "USD")
-                    .createNewTransaction())
-                    .when().post("/transactions")
-                    .then().statusCode(400);
-        }
     }
 }

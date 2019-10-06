@@ -36,17 +36,12 @@ public class TxServiceImpl implements TxService {
         }
 
         final var srcMoney = tx.getSourceMoney();
-        final var dstMoney = tx.getDestinationMoney();
-        if (!Currencies.validateCurrencies(dstMoney, srcMoney)) {
+        if (!Currencies.validateCurrencies(tx.getTargetCurrency(), srcMoney.getCurrency())) {
             return ctx.notFound("Currency code not found");
         }
 
         if (!usersService.isBalanceSufficient(senderId.get(), srcMoney)) {
             return ctx.badRequest("Insufficient balance");
-        }
-
-        if (dstMoney.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            return ctx.badRequest("Bad destination amount");
         }
 
         try (var conn = db.connection();
@@ -64,16 +59,15 @@ public class TxServiceImpl implements TxService {
 
         var stmt = conn.prepareStatement(
                 "INSERT INTO transactions(sender_id, receiver_id, status," +
-                "time_created, src_amount, src_currency, dst_amount, dst_currency ) " +
-                "SELECT u1.id, u2.id, 'new', NOW(), ?, ?, ?, ? " +
+                "time_created, src_amount, src_currency, dst_currency ) " +
+                "SELECT u1.id, u2.id, 'new', NOW(), ?, ?, ? " +
                 "FROM users u1 JOIN users u2 ON u1.id != u2.id " +
                 "WHERE u1.name = ? OR u2.name = ?", Statement.RETURN_GENERATED_KEYS);
         stmt.setBigDecimal(1, tx.getSourceMoney().getAmount());
         stmt.setString(2, tx.getSourceMoney().getCurrency());
-        stmt.setBigDecimal(3, tx.getDestinationMoney().getAmount());
-        stmt.setString(4, tx.getDestinationMoney().getCurrency());
-        stmt.setString(5, tx.getSender());
-        stmt.setString(6, tx.getReceiver());
+        stmt.setString(3, tx.getTargetCurrency());
+        stmt.setString(4, tx.getSender());
+        stmt.setString(5, tx.getReceiver());
         stmt.executeUpdate();
         return stmt;
     }

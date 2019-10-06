@@ -61,7 +61,7 @@ class TxServiceTest {
                 .setSender("alice")
                 .setReceiver("bob")
                 .setSourceMoney(1.0, "USD")
-                .setDestinationMoney(1.0, "USD")
+                .setTargetCurrency("USD")
                 .createNewTransaction();
 
         var createRs = txService.createTransaction(ctx, tx);

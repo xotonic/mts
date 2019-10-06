@@ -2,7 +2,6 @@ package com.revolut.mts.http;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.revolut.mts.dto.Body;
 
 import java.util.StringJoiner;
 

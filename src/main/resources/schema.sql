@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS transactions
     status       ENUM ('new', 'pending', 'finished')NOT NULL,
     time_created TIMESTAMP                          NOT NULL,
     dst_currency     CHAR(3)                        NOT NULL,
-    dst_amount       DECIMAL(19, 4)                 NOT NULL,
     src_currency     CHAR(3)                        NOT NULL,
     src_amount       DECIMAL(19, 4)                 NOT NULL,
     FOREIGN KEY (sender_id) REFERENCES users (id),
@@ -59,7 +58,6 @@ BEGIN
     DECLARE _sender_id VARCHAR(32);
     DECLARE _receiver_id VARCHAR(32);
     DECLARE _src_amount DECIMAL(19, 4);
-    DECLARE _dst_amount DECIMAL(19, 4);
     DECLARE _src_currency CHAR(3);
     DECLARE _dst_currency CHAR(3);
     DECLARE _status ENUM('new', 'pending', 'finished');
@@ -73,7 +71,6 @@ BEGIN
            sender_id,
            receiver_id,
            src_amount,
-           dst_amount,
            src_currency,
            dst_currency,
            status
@@ -83,7 +80,6 @@ BEGIN
         _sender_id,
         _receiver_id,
         _src_amount,
-        _dst_amount,
         _src_currency,
         _dst_currency,
         _status;
@@ -104,8 +100,8 @@ BEGIN
 
     # Increment balance of the receiver
     INSERT INTO balances(user_id, currency, balance)
-    VALUES (_receiver_id, _dst_currency, _dst_amount)
-    ON DUPLICATE KEY UPDATE balance = balance + _dst_amount;
+    VALUES (_receiver_id, _dst_currency, _src_amount)
+    ON DUPLICATE KEY UPDATE balance = balance + _src_amount;
 
     UPDATE transactions SET status = 'finished' WHERE id = txid;
 
