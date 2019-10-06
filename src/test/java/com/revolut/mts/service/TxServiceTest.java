@@ -30,7 +30,7 @@ class TxServiceTest {
         var rs = mtService.deposit(ctx, deposit);
 
         assertEquals(201, rs.getResponse().getStatus().code());
-        final var wallet = usersService.getWallet(ctx, "tester").getBody().result().get(0);
+        final var wallet = usersService.getUser(ctx, "tester").getBody().result().getWallet().get(0);
         assertEquals("USD", wallet.getCurrency());
         assertEquals(new BigDecimal(1.0), wallet.getAmount().stripTrailingZeros());
     }
@@ -60,17 +60,17 @@ class TxServiceTest {
         var tx = new NewTransactionBuilder()
                 .setSender("alice")
                 .setReceiver("bob")
-                .setSourceMoney(new MoneyAmount(new BigDecimal(1), "USD"))
-                .setDestinationMoney(new MoneyAmount(new BigDecimal(1), "USD"))
+                .setSourceMoney(1.0, "USD")
+                .setDestinationMoney(1.0, "USD")
                 .createNewTransaction();
 
         var createRs = txService.createTransaction(ctx, tx);
         assertTrue(createRs.isSuccess());
-        var commitRs = txService.commitTransaction(ctx, createRs.getBody());
+        var commitRs = txService.commitTransaction(ctx, createRs.getBody().result().getId());
 
         assertTrue(commitRs.isSuccess());
-        final var aliceWallet = usersService.getWallet(ctx, "alice").getBody().result().get(0);
-        final var bobWallet = usersService.getWallet(ctx, "bob").getBody().result().get(0);
+        final var aliceWallet = usersService.getUser(ctx, "alice").getBody().result().getWallet().get(0);
+        final var bobWallet = usersService.getUser(ctx, "bob").getBody().result().getWallet().get(0);
         assertEquals(aliceWallet.getCurrency(), bobWallet.getCurrency());
         assertEquals(aliceWallet.getAmount(), bobWallet.getAmount());
     }

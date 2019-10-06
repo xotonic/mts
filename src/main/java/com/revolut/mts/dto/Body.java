@@ -37,26 +37,4 @@ public class Body<RESULT> {
     public JSONError error() {
         return error;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Body<?> that = (Body<?>) o;
-        return Objects.equals(result, that.result) &&
-                Objects.equals(error, that.error);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(result, error);
-    }
-
-    @Override
-    public String toString() {
-        return "JSONResponse{" +
-                "result=" + result +
-                ", error=" + error +
-                '}';
-    }
 }

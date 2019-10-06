@@ -2,26 +2,19 @@ package com.revolut.mts.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-final public class User {
-
-    @JsonProperty("id")
-    private Integer id;
+public class NewUser {
 
     @JsonProperty("name")
     private String name;
 
-    public User() {}
+    public NewUser() {
+    }
 
-    public User(Integer id, String name) {
-        this.id = id;
+    public NewUser(String name) {
         this.name = name;
     }
 
     public String getName() {
         return name;
-    }
-
-    public Integer getId() {
-        return id;
     }
 }

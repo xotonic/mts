@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface TxService {
 
-    HResponse<Integer> createTransaction(RequestContext ctx, NewTransaction newTx) throws Exception;
+    HResponse<Body<TransactionId>> createTransaction(RequestContext ctx, NewTransaction newTx) throws Exception;
 
     HResponse<EmptyBody> commitTransaction(RequestContext ctx, Integer id) throws Exception;
 

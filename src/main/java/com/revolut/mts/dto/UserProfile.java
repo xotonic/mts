@@ -2,7 +2,9 @@ package com.revolut.mts.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-final public class User {
+import java.util.List;
+
+public class UserProfile {
 
     @JsonProperty("id")
     private Integer id;
@@ -10,15 +12,24 @@ final public class User {
     @JsonProperty("name")
     private String name;
 
-    public User() {}
+    @JsonProperty("wallet")
+    private List<MoneyAmount> wallet;
 
-    public User(Integer id, String name) {
+    public UserProfile() {
+    }
+
+    public UserProfile(Integer id, String name, List<MoneyAmount> wallet) {
         this.id = id;
         this.name = name;
+        this.wallet = wallet;
     }
 
     public String getName() {
         return name;
+    }
+
+    public List<MoneyAmount> getWallet() {
+        return wallet;
     }
 
     public Integer getId() {

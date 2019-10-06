@@ -94,9 +94,8 @@ public class HResponse<T> {
 
     private HttpResponse response(HStatus code, T body) {
         try {
-            var response = new Body<>(body);
             initObjectMapper();
-            var result = jsonMapper.writeValueAsString(response);
+            var result = jsonMapper.writeValueAsString(body);
             return new HttpResponse(code, MIME_TYPE_JSON, result);
         } catch (Exception e) {
             return rawError(HStatus.INTERNAL_ERROR);

@@ -22,12 +22,12 @@ public class TxServiceImpl implements TxService {
     }
 
     @Override
-    public HResponse<Integer> createTransaction(RequestContext ctx, NewTransaction tx) throws Exception {
+    public HResponse<Body<TransactionId>> createTransaction(RequestContext ctx, NewTransaction tx) throws Exception {
         try (var conn = db.connection();
              var stmt = createAndExecuteCreateStatement(conn, tx);
              var rs = stmt.getGeneratedKeys()) {
             if (rs.next()) {
-                return ctx.created(rs.getInt(1));
+                return ctx.created(new Body<>(new TransactionId(rs.getInt(1))));
             }
             return ctx.badRequest("Sender or/and receiver do not exist");
         }

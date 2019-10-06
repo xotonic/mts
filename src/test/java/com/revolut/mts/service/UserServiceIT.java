@@ -1,38 +1,54 @@
 package com.revolut.mts.service;
 
 import com.revolut.mts.Database;
+import com.revolut.mts.dto.NewUser;
 import com.revolut.mts.http.Server;
 import com.revolut.mts.http.SimpleRouter;
 import com.revolut.mts.util.DatabaseExtension;
-import com.revolut.mts.util.HttpClientExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith({HttpClientExtension.class, DatabaseExtension.class})
-public class UserServiceIT {
+@ExtendWith({DatabaseExtension.class})
+class UserServiceIT {
 
     @Test
-    void happyPath(HttpClient client, Database db) throws Exception {
+    void happyPath(Database db) throws Exception {
+
         var service = new UsersServiceImpl(db);
         var router = new SimpleRouter();
-        router.Put("/users/{string}", ctx -> service.createUser(ctx, ctx.getString(0)));
-        try (var server = new Server(router, 8080)) {
-            var request = HttpRequest.newBuilder()
-                    .PUT(HttpRequest.BodyPublishers.ofString("{}"))
-                    .uri(URI.create("http://localhost:8080/users/tester"))
-                    .build();
-            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            assertEquals(201, response.statusCode());
-            final var userId = service.getUser("tester");
-            assertTrue(userId.isPresent());
+        router.Post("/users", ctx -> service.createUser(ctx, ctx.body(NewUser.class).getName()));
+        router.Get("/users/{string}", ctx -> service.getUser(ctx, ctx.getString(0)));
+
+        try (var ignored = new Server(router, 8080)) {
+
+            var id = given().body(new NewUser("tester"))
+                    .when().post("/users")
+                    .then().statusCode(201)
+                    .extract().jsonPath().getInt("result.id");
+
+            when().get("/users/tester")
+                    .then().statusCode(200)
+                    .body("result.id", equalTo(id))
+                    .body("result.name", equalTo("tester"))
+                    .body("result.wallet", hasSize(equalTo(0)));
+        }
+    }
+
+    @Test
+    void respond404IfUsedDoesNotExist(Database db) throws Exception {
+
+        var service = new UsersServiceImpl(db);
+        var router = new SimpleRouter();
+        router.Get("/users/{string}", ctx -> service.getUser(ctx, ctx.getString(0)));
+
+        try (var ignored = new Server(router, 8080)) {
+            when().get("/users/tester").then().statusCode(404);
         }
     }
 }

@@ -20,9 +20,8 @@ class UsersServiceTest {
         var ctx = new RequestContextImpl(new ResponseProviderImpl());
 
         var rs = service.createUser(ctx, "tester");
-
-        assertEquals(new EmptyBody(), rs.getBody());
-        final var userId = service.getUser("tester");
+        assertTrue(rs.isSuccess());
+        final var userId = service.checkUserExists("tester");
         assertTrue(userId.isPresent());
     }
 
@@ -33,10 +32,10 @@ class UsersServiceTest {
         var ctx = new RequestContextImpl(new ResponseProviderImpl());
         service.createUser(ctx, "tester");
 
-        var rs = service.getWallet(ctx, "tester");
+        var rs = service.getUser(ctx, "tester");
 
         assertEquals(HStatus.OK, rs.getStatus());
-        assertTrue(rs.getBody().result().isEmpty());
+        assertTrue(rs.getBody().result().getWallet().isEmpty());
     }
 
     @Test
@@ -46,7 +45,7 @@ class UsersServiceTest {
         var ctx = new RequestContextImpl(new ResponseProviderImpl());
 
         var rs = service.createUser(ctx, "tester");
-        assertEquals(new EmptyBody(), rs.getBody());
+        assertTrue(rs.getBody().succeed());
 
         rs = service.createUser(ctx, "tester");
 
