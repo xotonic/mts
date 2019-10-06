@@ -9,7 +9,10 @@
         <Logger name="com.revolut" level="debug" additivity="false">
             <AppenderRef ref="LogToConsole"/>
         </Logger>
-        <Root level="error">
+        <Logger name="org.nanohttpd" level="warn" additivity="false">
+            <AppenderRef ref="LogToConsole"/>
+        </Logger>
+        <Root level="debug">
             <AppenderRef ref="LogToConsole"/>
         </Root>
     </Loggers>

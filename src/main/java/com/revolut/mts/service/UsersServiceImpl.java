@@ -30,7 +30,7 @@ public class UsersServiceImpl implements UsersService {
             stmt.setString(1, userName);
 
             stmt.executeUpdate();
-            return ctx.ok(new EmptyBody());
+            return ctx.created(new EmptyBody());
         } catch (SQLIntegrityConstraintViolationException e) {
             return ctx.conflict("The user already exists");
         }
@@ -57,7 +57,7 @@ public class UsersServiceImpl implements UsersService {
              var rs = stmt.executeQuery()) {
             var list = new ArrayList<MoneyAmount>();
             while (rs.next()) {
-                var amount = new MoneyAmount(rs.getBigDecimal(1), rs.getString(2));
+                var amount = new MoneyAmount(rs.getBigDecimal(2), rs.getString(1));
                 list.add(amount);
             }
             return ctx.ok(new Body<>(list));

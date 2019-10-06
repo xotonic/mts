@@ -3,7 +3,7 @@ package com.revolut.mts.http;
 import com.revolut.mts.dto.EmptyBody;
 import com.revolut.mts.http.routing.RoutePath;
 
-public interface RequestContext extends ResponseProvider, RoutePath {
+public interface RequestContext extends ResponseProvider, RoutePath, RequestProvider {
 
     default <T> HResponse<T> ok(T body) {
         return respond(HStatus.OK, body);
@@ -23,5 +23,11 @@ public interface RequestContext extends ResponseProvider, RoutePath {
 
     default <T> HResponse<T> notFound(String message) {
         return error(HStatus.NOT_FOUND, message);
+    }
+    default <T> HResponse<T> internalError(String message) {
+        return error(HStatus.INTERNAL_ERROR, message);
+    }
+    default <T> HResponse<T> badRequest(String message) {
+        return error(HStatus.BAD_REQUEST, message);
     }
 }

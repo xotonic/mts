@@ -7,11 +7,11 @@ import java.util.Objects;
 
 final public class MoneyAmount {
 
-    @JsonProperty("amount")
-    private BigDecimal amount;
-
     @JsonProperty("currency")
     private String currency;
+
+    @JsonProperty("amount")
+    private BigDecimal amount;
 
     public MoneyAmount(BigDecimal amount, String currency) {
         this.amount = amount;

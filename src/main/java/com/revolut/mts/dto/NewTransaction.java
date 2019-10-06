@@ -13,6 +13,15 @@ final public class NewTransaction {
     @JsonProperty("destination_money")
     private MoneyAmount destinationMoney;
 
+    public NewTransaction() {}
+
+    public NewTransaction(String sender, String receiver, MoneyAmount sourceMoney, MoneyAmount destinationMoney) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.sourceMoney = sourceMoney;
+        this.destinationMoney = destinationMoney;
+    }
+
     public String getSender() {
         return sender;
     }
