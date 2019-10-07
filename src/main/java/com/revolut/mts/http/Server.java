@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+/**
+ * Simple wrapper over {@link HttpServer}.
+ * Creates context for {@link Router} and request handlers.
+ */
 public class Server implements AutoCloseable {
     private static final Logger logger = LogManager.getLogger(Server.class);
 
@@ -19,6 +23,12 @@ public class Server implements AutoCloseable {
 
     private Router router;
 
+    /**
+     * Build an instance of HTTP server and start it immediately
+     * @param router Path router
+     * @param port Port to bind
+     * @throws IOException
+     */
     public Server(Router router, int port) throws IOException {
 
         this.router = router;
@@ -30,11 +40,16 @@ public class Server implements AutoCloseable {
         logger.info("Http server started on port {}", port);
     }
 
+    /**
+     * Launch request handler in separate thread.
+     *
+     * @param exchange NIO interface to read request data and write to response
+     */
     private void handleRequest(HttpExchange exchange) {
-        Executors.newSingleThreadExecutor().submit(() -> processResponce(exchange));
+        Executors.newSingleThreadExecutor().submit(() -> processResponse(exchange));
     }
 
-    private void processResponce(HttpExchange exchange) {
+    private void processResponse(HttpExchange exchange) {
         try {
             final var responseProvider = new ResponseProviderImpl();
             var method = HMethod.map(exchange.getRequestMethod());
@@ -59,12 +74,20 @@ public class Server implements AutoCloseable {
         }
     }
 
+    /**
+     * Stop server. Don not wait for request handlers to finish.
+     */
     public void stop() {
         server.stop(0);
     }
 
+    /**
+     * Another way to stop this server.
+     * Put an instance of this server to try-with-resources block
+     * to make it automatically stop after moving out of the scope.
+     */
     @Override
-    public void close() throws Exception {
+    public void close() {
         stop();
     }
 }

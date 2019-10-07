@@ -12,6 +12,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
+/**
+ * A service for working with users in database
+ */
 public class UsersServiceImpl implements UsersService {
 
     private Database db;
@@ -20,6 +23,13 @@ public class UsersServiceImpl implements UsersService {
         this.db = db;
     }
 
+    /**
+     * Create user in DB and return its id
+     * @param ctx Request context
+     * @param userName Unique name of the user
+     * @return HTTP response with user id or error
+     * @throws SQLException
+     */
     @Override
     public HResponse<Body<User>> createUser(RequestContext ctx, String userName) throws SQLException {
         try (var conn = db.connection();
@@ -36,6 +46,11 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+    /**
+     * Check if user with given name exists in the database
+     * @param userName User name
+     * @return Id of the user or nothing if he does not exist
+     */
     @Override
     public Optional<Integer> checkUserExists(String userName) throws Exception {
         try (var conn = db.connection();
@@ -49,6 +64,12 @@ public class UsersServiceImpl implements UsersService {
         }
     }
 
+    /**
+     * Check whether currency balance of given user is greater than the given
+     * @param userId Id of the user holding balance
+     * @param minAmount Minimal value of his balance
+     * @return True if users has enough balance or false otherwise
+     */
     @Override
     public boolean isBalanceSufficient(Integer userId, MoneyAmount minAmount)
             throws SQLException {
@@ -69,6 +90,12 @@ public class UsersServiceImpl implements UsersService {
        return stmt;
     }
 
+    /**
+     * Read user and theirs balance from database
+     * @param ctx Request context
+     * @param userName User name
+     * @return UserProfile object or error if there is no such user
+     */
     @Override
     public HResponse<Body<UserProfile>> getUser(RequestContext ctx, String userName) throws Exception {
         var optId = checkUserExists(userName);

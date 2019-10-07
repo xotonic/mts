@@ -5,6 +5,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
+/**
+ * Represents a path without known arguments
+ * E.g. /users/{id}
+ * Can parse string and integer arguments
+ * Can be stored as a key
+ */
 public class RouteTemplate {
 
     List<Token> tokens;

@@ -1,5 +1,9 @@
 package com.revolut.mts.http.routing;
 
+/**
+ * Should provide a request handler, parsed path arguments
+ * and fact of handler existence.
+ */
 public interface RoutingResult {
     static RoutingResult miss(RoutedHandler handler) {
         return new RoutingResult() {

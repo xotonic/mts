@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * A wrapper for com.sun.* exchange object.
+ * Forms default headers (e.g. date)
+ * and writes the response data into the input stream.
+ */
 public class HttpResponse {
 
     private final HStatus status;
@@ -20,6 +25,11 @@ public class HttpResponse {
         this.extraHeaders = new HashMap<>();
     }
 
+    /**
+     * Add an arbitrary header
+     * @param name Header name
+     * @param value Header value
+     */
     public void addHeader(String name, String value) {
         extraHeaders.put(name, value);
     }
@@ -28,6 +38,11 @@ public class HttpResponse {
         return status;
     }
 
+    /**
+     * Write data of this object to given exchange object
+     * @param exchange HTTP exchange
+     * @throws IOException
+     */
     public void write(HttpExchange exchange) throws IOException {
         final var headers = exchange.getResponseHeaders();
         headers.add("Content-Type", mime);

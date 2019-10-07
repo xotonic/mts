@@ -11,6 +11,10 @@ import org.mariadb.jdbc.MariaDbDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * Embedded MariaDB instance
+ * Loads schema on initialization and provides pooled connections.
+ */
 public class MariaDB implements Database {
 
     private static final Logger logger = LogManager.getLogger(MariaDB.class);

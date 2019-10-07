@@ -11,17 +11,32 @@ import org.apache.logging.log4j.Logger;
 import java.math.BigDecimal;
 import java.sql.*;
 
+/**
+ * A service for working with transaction objects
+ */
 public class TxServiceImpl implements TxService {
+
     private static final Logger logger = LogManager.getLogger(TxServiceImpl.class);
 
     private Database db;
     private UsersService usersService;
 
+    /**
+     * Construct an instance
+     * @param db DB that stores transactions and users
+     * @param usersService Service providing access to users
+     */
     public TxServiceImpl(Database db, UsersService usersService) {
         this.db = db;
         this.usersService = usersService;
     }
 
+    /**
+     * Create transaction in database
+     * @param ctx Request context
+     * @param tx Data for new transaction
+     * @return HTTP Response with tx id or error
+     */
     @Override
     public HResponse<Body<TransactionId>> createTransaction(RequestContext ctx, NewTransaction tx) throws Exception {
 
@@ -72,6 +87,13 @@ public class TxServiceImpl implements TxService {
         return stmt;
     }
 
+    /**
+     * Commit existing transaction.
+     * Change atomically balances of users in the transaction
+     * @param ctx Request context
+     * @param txid Id of existing transaction
+     * @return Empty HTTP response
+     */
     @Override
     public HResponse<EmptyBody> commitTransaction(RequestContext ctx,  Integer txid) throws SQLException
     {
@@ -89,6 +111,12 @@ public class TxServiceImpl implements TxService {
         return stmt;
     }
 
+    /**
+     * Increase balance of user
+     * @param ctx Request context
+     * @param deposit Input object with username and data about the deposit
+     * @return Empty HTTP response or one containing error if check fails
+     */
     @Override
     public HResponse<EmptyBody> deposit(RequestContext ctx, Deposit deposit) throws Exception {
 

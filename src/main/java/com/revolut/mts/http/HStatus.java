@@ -1,6 +1,9 @@
 package com.revolut.mts.http;
 
 
+/**
+ * The only used response statuses
+ */
 public enum HStatus {
     OK(200, "OK"),
     CREATED(201, "Created"),

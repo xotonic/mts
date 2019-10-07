@@ -13,6 +13,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
+/**
+ * The application consists of HTTP server and embedded database
+ */
 public class Application {
 
     private final static Logger logger = LogManager.getLogger(Application.class);
@@ -26,6 +29,12 @@ public class Application {
         }
     }
 
+    /**
+     * Define routes and its handlers
+     * @param db Database that is used to store entities
+     * @return Started HTTP server
+     * @throws IOException
+     */
     public Server start(Database db) throws IOException {
 
         var userService = new UsersServiceImpl(db);

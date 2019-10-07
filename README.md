@@ -24,6 +24,93 @@ Implicit requirements:
 
 Please put your work on github or bitbucket. 
 
+## About the project
+
+ - There was intention to keep the minimal list of dependencies.
+   Eventually, this project got only some dependencies for logging,
+   parsing JSON and embedded relational database
+ - The embedded database is MariaDB (MySQL compatible).
+   There is no need to install dependencies. The daemon spins up automatically on application startup.
+ - A tiny HTTP framework was written for this project.
+   It uses only what really needed - e.g. it does not even know about the full list of HTTP methods and
+   status codes. See the sources in `src/main/java/com/revolut/mts/http`, usage in `Application.java`.
+ - API is minimalistic as well.
+ 
+## API
+
+- Create user
+
+       POST /users => 201
+       
+       Request object:
+       {
+           "name": "alice"
+       } 
+       
+       Response object:
+       {
+           "id": 1,
+           "name": "alice"
+       }
+
+- Deposit money to user account
+
+       POST /deposits
+       
+       Request object:
+       {
+           "username": "alice",
+           "amount": {
+              "currency" : "USD",
+              "amount": 1.0
+           }
+       }
+       
+       Response is empty
+ 
+ - Get user and their balance
+       
+       GET /users/{user-name} => 201
+       
+       Response object:
+       {
+          "id": 1,
+          "name": "alice",
+          "wallet": [
+              {
+                 "currency": "USD",
+                 "amount": 122.0
+              },
+              ...
+          ]
+       }
+ 
+ - Create transaction 
+ 
+       POST /transactions => 201
+       
+       Request object:
+       {
+           "sender": "alice",
+           "receiver": "bob",
+           "target_currency": "USD",
+           "source_money": {
+               "amount": 1.0,
+               "currency": "BTC"
+           }
+       }
+       
+       Response object:
+       {
+           "id": 123
+       }
+
+- Commit transaction
+
+       PUT /transcation/{txid} => 200
+       
+       Respose is empty
+       
 ## Design decisions
 
 ### How to store currency codes?
@@ -43,7 +130,7 @@ ways has been considered to be more appropriate. Currently, MySQL MEMORY engine 
 support foreign keys checks on inserts and updates so the testing for existence of 
 a currency is moved on application layer.
 
-Also, assume the similar implementation of the operation in PostgreSQL:
+Also, consider the similar implementation of the operation in PostgreSQL:
 >The problem is that changing the member list for an ENUM column
 >restructures the entire table with ALTER TABLE, which can be very
 >expensive on resources and time. If you have ENUM('red', 'blue', 'black')
